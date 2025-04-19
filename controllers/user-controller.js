@@ -82,9 +82,21 @@ const updateUser = async (req, res) => {
     }
 }
 
+const remove = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await userSchema.delete(`WHERE id = '${id}'`);
+        res.status(200).json({ message: 'User deleted', user });
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
 module.exports = {
     register,
     getAll,
     getByID,
-    updateUser
+    updateUser,
+    remove
 }
