@@ -3,7 +3,7 @@ const Schema = require('../lib/db');
 const transactionSchema = new Schema('transactions');
 const categorySchema = new Schema('categories');
 
-const createTransaction = async (req, res) => {
+const create = async (req, res) => {
     try {
         const { category_id, amount, type, description, note, is_recurring, date } = req.body;
         const user_id = req.user?.id;
@@ -42,7 +42,7 @@ const createTransaction = async (req, res) => {
     }
 }
 
-const getAllTransactions = async (req, res) => {
+const getAll = async (req, res) => {
     try {
         const user_id = req.user?.id;
         const { start_date, end_date, type, category_id } = req.query;
@@ -70,7 +70,7 @@ const getAllTransactions = async (req, res) => {
     }
 }
 
-const getTransactionById = async (req, res) => {
+const getById = async (req, res) => {
     try {
         const { id } = req.params;
         const user_id = req.user?.id;
@@ -88,7 +88,7 @@ const getTransactionById = async (req, res) => {
     }
 }
 
-const updateTransaction = async (req, res) => {
+const update = async (req, res) => {
     try {
         const { id } = req.params;
         const user_id = req.user?.id;
@@ -132,7 +132,7 @@ const updateTransaction = async (req, res) => {
     }
 }
 
-const deleteTransaction = async (req, res) => {
+const remove = async (req, res) => {
     try {
         const { id } = req.params;
         const user_id = req.user?.id;
@@ -152,9 +152,9 @@ const deleteTransaction = async (req, res) => {
 }
 
 module.exports = {
-    createTransaction,
-    getAllTransactions,
-    getTransactionById,
-    updateTransaction,
-    deleteTransaction
+    create,
+    getAll,
+    getById,
+    update,
+    remove
 } 

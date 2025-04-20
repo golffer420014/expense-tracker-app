@@ -1,24 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const { createTransaction, getAllTransactions, getTransactionById, updateTransaction, deleteTransaction } = require('../controllers/transactions-controller');
+const { create, getAll, getById, update, remove } = require('../controllers/transactions-controller');
 // const authMiddleware = require('../middleware/auth');
 
 // Apply auth middleware to all transaction routes
 // router.use(authMiddleware);
 
 // POST /transactions - Create a new transaction
-router.post('/', createTransaction);
+router.post('/create', create);
 
 // GET /transactions - Get all transactions with optional filters
-router.get('/', getAllTransactions);
+router.get('/get-all', getAll);
 
 // GET /transactions/:id - Get a specific transaction by ID
-router.get('/:id', getTransactionById);
+router.get('/get-by-id/:id', getById);
 
 // PUT /transactions/:id - Update a transaction
-router.put('/:id', updateTransaction);
+router.put('/update-transaction/:id', update);
 
 // DELETE /transactions/:id - Delete a transaction
-router.delete('/:id', deleteTransaction);
+router.delete('/remove-transaction/:id', remove);
 
 module.exports = router; 
