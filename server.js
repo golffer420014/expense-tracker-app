@@ -7,15 +7,21 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
+// const auth = require('./middleware/auth');
+// app.use(auth);
 
 // route
 const user = require('./route/user');
+const categories = require('./route/categories');
+const transactions = require('./route/transactions');
+
 app.get('/', (req, res) => {
   res.send('Hello World');
 });
+
 app.use('/user', user);
-
-
+app.use('/categories', categories);
+app.use('/transactions', transactions);
 
 // Start server
 app.listen(port, () => {

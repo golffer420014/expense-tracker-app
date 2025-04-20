@@ -84,6 +84,7 @@ const updateUser = async (req, res) => {
 
 const remove = async (req, res) => {
     try {
+        // ยังไม่ได้เทส
         const { id } = req.params;
         const user = await userSchema.delete(`WHERE id = '${id}'`);
         res.status(200).json({ message: 'User deleted', user });
