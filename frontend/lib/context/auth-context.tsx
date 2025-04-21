@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { showToast } from '@/lib/utils/toast';
+import axios from 'axios';
 
 type User = {
   id: string;
@@ -13,6 +14,7 @@ type User = {
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
+  register: (username: string, name: string, password: string) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -31,15 +33,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const token = localStorage.getItem('token');
         if (token) {
-          const response = await fetch('/api/auth/me', {
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
             headers: {
-              Authorization: `Bearer ${token}`,
-            },
+              'Authorization': `Bearer ${token}`
+            }
           });
-          
-          if (response.ok) {
-            const userData = await response.json();
-            setUser(userData);
+          if (response.status === 200) {
+            setUser(response.data);
           } else {
             localStorage.removeItem('token');
           }
@@ -54,21 +54,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
+  const register = async (username: string, name: string, password: string) => {
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/register`, { username, name, password });
+      if (response.status !== 200) {
+        throw new Error('Register failed');
+      }
+      showToast.success('สมัครสมาชิกสำเร็จ');
+      return response.data;
+    } catch (error) {
+      showToast.error('สมัครสมาชิกไม่สำเร็จ');
+      console.error('Register failed:', error);
+    }
+  }
+
   const login = async (username: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
+      // const response = await api.post('/auth/login', { username, password });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, { username, password });
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Login failed');
       }
 
-      const data = await response.json();
+      const data = response.data;
       localStorage.setItem('token', data.token);
       setUser(data.user);
       showToast.success('เข้าสู่ระบบสำเร็จ');
@@ -91,6 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = {
     user,
     isLoading,
+    register,
     login,
     logout,
     isAuthenticated: !!user,

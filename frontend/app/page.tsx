@@ -15,8 +15,10 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Eye, EyeOff, Lock, User,IdCard } from "lucide-react"
 import { showToast } from "@/lib/utils/toast"
+import { useAuth } from "@/lib/context/auth-context";
 
 export default function AuthTabs() {
+  const { login, register } = useAuth();
   const [showPassword, setShowPassword] = useState(false)
   const [formLogin, setFormLogin] = useState({
     username: "",
@@ -44,21 +46,20 @@ export default function AuthTabs() {
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    showToast.success("Login successful")
+    login(formLogin.username, formLogin.password)
   }
 
   const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log(formRegister)
     if (formRegister.password !== formRegister.confirmPassword) {
       showToast.error("Password and confirm password do not match")
       return
     }
-    
-    showToast.success("Register successful")
+    register(formRegister.username, formRegister.name, formRegister.password)
   }
 
   return (
+
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">

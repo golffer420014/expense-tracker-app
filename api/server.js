@@ -1,19 +1,23 @@
 const express = require('express');
 require('dotenv').config();
+const cors = require('cors');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3009;
+const authMiddleware = require('./middleware/auth');
+
 
 // PostgreSQL connection pool
 
 // Middleware
+app.use(cors());
 app.use(express.json());
-// const auth = require('./middleware/auth');
-// app.use(auth);
+app.use(authMiddleware);
 
 // route
 const user = require('./route/user');
 const categories = require('./route/categories');
 const transactions = require('./route/transactions');
+const auth = require('./route/auth');
 
 app.get('/', (req, res) => {
   res.send('Hello World');
@@ -22,6 +26,7 @@ app.get('/', (req, res) => {
 app.use('/user', user);
 app.use('/categories', categories);
 app.use('/transactions', transactions);
+app.use('/auth', auth);
 
 // Start server
 app.listen(port, () => {
