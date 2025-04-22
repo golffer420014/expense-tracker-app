@@ -8,6 +8,7 @@ const create = async (req, res) => {
         const { category_id, amount, type, description, note, is_recurring, date } = req.body;
         const user_id = req.user?.id;
 
+
         if (!amount || !type || !date) {
             return res.status(400).json({ message: 'Missing required fields.' });
         }

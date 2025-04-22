@@ -1,8 +1,12 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { AuthProvider } from "@/lib/context/auth-context";
+import { TransactionsProvider } from "@/lib/context/transactions-context";
+import { ThemeProvider } from "@/lib/context/theme-provider";
+import { ModeToggle } from "@/components/mode-toggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,18 +29,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <header className="sticky top-0 z-10 bg-background border-b">
-            <div className="container max-w-md mx-auto p-4 flex items-center justify-between">
-              <h1 className="text-xl font-bold">Expense Tracker</h1>
-              {/* <ModeToggle /> */}
-            </div>
-          </header>
-          {children}
+          <TransactionsProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <header className="sticky top-0 z-10 bg-background border-b">
+                <div className="container max-w-md mx-auto p-4 flex items-center justify-between">
+                  <h1 className="text-xl font-bold">Expense Tracker</h1>
+                  <ModeToggle />
+                </div>
+              </header>
+              {children}
+            </ThemeProvider>
+          </TransactionsProvider>
         </AuthProvider>
         <Toaster richColors position="top-right" />
       </body>

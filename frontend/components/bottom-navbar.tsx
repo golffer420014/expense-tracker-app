@@ -44,108 +44,57 @@ export function BottomNavbar() {
     },
   ]
 
-  // Split the routes into two parts for layout
-  const firstHalf = routes.slice(0, 2)
-  const secondHalf = routes.slice(2, 4)
-
   if (!mounted) return null
 
 //   const isDarkTheme = theme === "dark"
 
   return (
     <>
-      <div
-        className={cn(
-          "fixed bottom-0 left-0 right-0 z-10 backdrop-blur-md",
-          // isDarkTheme
-          //   ? "bg-gray-900/90 border-t border-gray-800"
-          //   : "bg-white/90 border-t border-gray-100 shadow-[0_-4px_10px_rgba(0,0,0,0.03)]",
-        )}
-      >
-        <div className="container max-w-md mx-auto">
-          <div className="flex justify-between items-center h-16 px-4">
-            <div className="flex justify-around items-center flex-1">
-              {firstHalf.map((route) => {
-                const isActive = pathname === route.path
-                return (
-                  <Link
-                    key={route.path}
-                    href={route.path}
-                    className="group relative flex flex-col items-center justify-center w-full h-full"
-                  >
-                    <div
-                      className={cn(
-                        "absolute -top-1 w-1 h-1 rounded-full transition-all duration-300",
-                        isActive ? "bg-primary scale-100" : "scale-0",
-                      )}
-                    />
-                    <div
-                      className={cn(
-                        "flex flex-col items-center justify-center transition-all duration-200",
-                        isActive ? "text-primary -translate-y-1" : "text-muted-foreground group-hover:text-primary/70",
-                      )}
-                    >
-                      {route.icon}
-                      <span className={cn("text-xs mt-1 transition-all", isActive ? "font-medium" : "font-normal")}>
-                        {route.name}
-                      </span>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
-
-            {/* Center Add Button */}
-            <div className="flex-shrink-0 -mt-8 relative">
-              <div
-                className={cn(
-                  "absolute inset-0 rounded-full blur-md -z-10 opacity-30",
-                  // isDarkTheme ? "bg-primary" : "bg-primary",
-                )}
-              />
+      <div className="fixed bottom-0 left-0 right-0 z-50">
+        <div className="container max-w-md mx-auto px-4">
+          <div className="relative">
+            {/* Floating Add Button */}
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-10">
               <Button
                 onClick={() => setOpen(true)}
                 size="icon"
-                className={cn(
-                  "h-14 w-14 rounded-full shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95",
-                  // isDarkTheme
-                  //   ? "bg-gradient-to-br from-primary to-primary/80 hover:from-primary hover:to-primary/90"
-                  "bg-gradient-to-br from-primary to-primary/80 hover:from-primary hover:to-primary/90",
-                )}
+                className="h-16 w-16 rounded-full shadow-lg bg-gradient-to-br from-primary to-primary/80 hover:from-primary hover:to-primary/90 transition-all duration-300 hover:scale-105 active:scale-95"
               >
-                <Plus className="h-6 w-6 text-white" />
+                <Plus className="h-8 w-8 text-white" />
               </Button>
             </div>
 
-            <div className="flex justify-around items-center flex-1">
-              {secondHalf.map((route) => {
-                const isActive = pathname === route.path
-                return (
-                  <Link
-                    key={route.path}
-                    href={route.path}
-                    className="group relative flex flex-col items-center justify-center w-full h-full"
-                  >
-                    <div
+            {/* Navigation Bar */}
+            <div className="bg-background/80 backdrop-blur-lg rounded-2xl border border-border shadow-lg">
+              <div className="flex justify-between items-center h-20 px-6">
+                {routes.map((route) => {
+                  const isActive = pathname === route.path
+                  return (
+                    <Link
+                      key={route.path}
+                      href={route.path}
                       className={cn(
-                        "absolute -top-1 w-1 h-1 rounded-full transition-all duration-300",
-                        isActive ? "bg-primary scale-100" : "scale-0",
-                      )}
-                    />
-                    <div
-                      className={cn(
-                        "flex flex-col items-center justify-center transition-all duration-200",
-                        isActive ? "text-primary -translate-y-1" : "text-muted-foreground group-hover:text-primary/70",
+                        "flex flex-col items-center justify-center gap-1 w-16",
+                        "transition-all duration-300",
+                        isActive ? "text-primary" : "text-muted-foreground hover:text-primary/70"
                       )}
                     >
-                      {route.icon}
-                      <span className={cn("text-xs mt-1 transition-all", isActive ? "font-medium" : "font-normal")}>
+                      <div className={cn(
+                        "p-2 rounded-full transition-all duration-300",
+                        isActive ? "bg-primary/10" : "hover:bg-primary/5"
+                      )}>
+                        {route.icon}
+                      </div>
+                      <span className={cn(
+                        "text-xs font-medium transition-all duration-300",
+                        isActive ? "scale-110" : "scale-100"
+                      )}>
                         {route.name}
                       </span>
-                    </div>
-                  </Link>
-                )
-              })}
+                    </Link>
+                  )
+                })}
+              </div>
             </div>
           </div>
         </div>

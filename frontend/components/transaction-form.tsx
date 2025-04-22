@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -16,16 +16,30 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { cn } from "@/lib/utils"
+import { useTransactions } from "@/lib/context/transactions-context"
+import axios from "axios"
+import { toast } from "sonner"
 
 const formSchema = z.object({
   type: z.enum(["expense", "income"]),
   amount: z.string().min(1, "กรุณาระบุจำนวนเงิน"),
   category: z.string().min(1, "กรุณาเลือกหมวดหมู่"),
   description: z.string().optional(),
+  note: z.string().optional(),
   date: z.date({
     required_error: "กรุณาเลือกวันที่",
   }),
 })
+
+interface categories {
+  id: number;
+  category_id: number;
+  name: string;
+  type: string;
+  note: string;
+  description: string;
+  date: Date;
+}
 
 type TransactionFormProps = {
   onSuccess: () => void
@@ -33,7 +47,24 @@ type TransactionFormProps = {
 }
 
 export function TransactionForm({ onSuccess, initialData }: TransactionFormProps) {
+  const { createTransaction } = useTransactions();
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const [expenseCategories, setExpenseCategories] = useState<categories[]>([])
+  const [incomeCategories, setIncomeCategories] = useState<categories[]>([])
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const categories = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/categories/get-all`)
+      setExpenseCategories(categories.data.filter((category: categories) => category.type === "expense"))
+      setIncomeCategories(categories.data.filter((category: categories) => category.type === "income"))
+
+
+    };
+
+    fetchCategories();
+  }, []);
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,33 +77,25 @@ export function TransactionForm({ onSuccess, initialData }: TransactionFormProps
     },
   })
 
+
   const transactionType = form.watch("type")
 
-  const expenseCategories = [
-    { id: "food", name: "อาหาร" },
-    { id: "transport", name: "เดินทาง" },
-    { id: "shopping", name: "ช้อปปิ้ง" },
-    { id: "housing", name: "ที่พัก" },
-    { id: "health", name: "สุขภาพ" },
-    { id: "entertainment", name: "บันเทิง" },
-    { id: "other", name: "อื่นๆ" },
-  ]
 
-  const incomeCategories = [
-    { id: "salary", name: "เงินเดือน" },
-    { id: "bonus", name: "โบนัส" },
-    { id: "gift", name: "ของขวัญ" },
-    { id: "investment", name: "ลงทุน" },
-    { id: "other", name: "อื่นๆ" },
-  ]
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true)
 
     try {
-      // Here you would save the transaction to your database
-      console.log("Form values:", values)
-
+      await createTransaction({
+        type: values.type,
+        amount: parseFloat(values.amount),
+        category_id: parseInt(values.category),
+        description: values.description,
+        note: values.note,
+        date: values.date,
+        is_recurring: false,
+      })
+      toast.success("บันทึกรายการสำเร็จ")
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
@@ -159,7 +182,7 @@ export function TransactionForm({ onSuccess, initialData }: TransactionFormProps
                 </FormControl>
                 <SelectContent>
                   {(transactionType === "expense" ? expenseCategories : incomeCategories).map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
+                    <SelectItem key={category.id} value={category.id.toString()}>
                       {category.name}
                     </SelectItem>
                   ))}

@@ -18,6 +18,7 @@ type AuthContextType = {
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
+  getToken: () => string | null;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -97,13 +98,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push('/login');
   };
 
+  const getToken = () => {
+    return localStorage.getItem('token');
+  }
+
   const value = {
     user,
     isLoading,
     register,
     login,
     logout,
+    getToken,
     isAuthenticated: !!user,
+  
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
