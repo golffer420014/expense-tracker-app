@@ -53,7 +53,7 @@ export function CategoryBreakdown() {
         // Group by category and sum amounts
         const categoryMap = new Map<string, number>()
         expenseCategories.forEach(transaction => {
-            const category = transaction.description || "ไม่มีคำอธิบาย"
+            const category = transaction.description || "N/A"
             const currentAmount = categoryMap.get(category) || 0
             // Convert amount to number if it's a string
             const amount = typeof transaction.amount === 'string'
@@ -69,7 +69,6 @@ export function CategoryBreakdown() {
             color: COLORS[index % COLORS.length]
         }))
 
-        console.log(categoryData)
 
         setData(categoryData)
     }, [transactions])
@@ -151,7 +150,7 @@ export function CategoryBreakdown() {
                                 ))}
                             </Pie>
                             <Tooltip
-                                content={<CustomTooltip active={true} payload={data} label={data.name} />}
+                                content={<CustomTooltip active={true} payload={data} />}
                             />
                         </PieChart>
                     </ResponsiveContainer>

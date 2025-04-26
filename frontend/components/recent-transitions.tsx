@@ -1,34 +1,32 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
-import { ShoppingBag, MoreVertical, Plus, Minus, ArrowRight } from "lucide-react"
+import { ShoppingBag, MoreVertical, Plus, Minus, ArrowRight, Coffee, Bus, Home, Briefcase } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useTransactions } from "@/lib/context/transactions-context"
-import axios from "axios"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-
-// Helper function to get icon by category
-// const getCategoryIcon = (category: string) => {
-//   switch (category) {
-//     case "อาหาร":
-//       return <Coffee className="h-4 w-4" />
-//     case "เดินทาง":
-//       return <Bus className="h-4 w-4" />
-//     case "ช้อปปิ้ง":
-//       return <ShoppingBag className="h-4 w-4" />
-//     case "ที่พัก":
-//       return <Home className="h-4 w-4" />
-//     case "รายได้":
-//       return <Briefcase className="h-4 w-4" />
-//     default:
-//       return <Coffee className="h-4 w-4" />
-//   }
-// }
+import { useRouter } from "next/navigation"
+import { useCategories } from "@/lib/context/categories-context"
+const getCategoryIcon = (category: string) => {
+    switch (category) {
+        case "อาหาร":
+            return <Coffee className="h-4 w-4" />
+        case "เดินทาง":
+            return <Bus className="h-4 w-4" />
+        case "ช้อปปิ้ง":
+            return <ShoppingBag className="h-4 w-4" />
+        case "ที่พัก":
+            return <Home className="h-4 w-4" />
+        case "รายได้":
+            return <Briefcase className="h-4 w-4" />
+        default:
+            return <Coffee className="h-4 w-4" />
+    }
+}
 
 // Helper function to get color by category
 const getCategoryColor = (category: string) => {
@@ -48,29 +46,13 @@ const getCategoryColor = (category: string) => {
     }
 }
 
-interface categories {
-    id: number;
-    name: string;
-}
+
 
 export function RecentTransactions() {
-    const { transactions, isLoading } = useTransactions();
-    const [categories, setCategories] = useState<categories[]>([]);
-    const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
+    const router = useRouter()
+    const { transactions, isLoading: isTransactionsLoading } = useTransactions();
+    const { categories, isLoading: isCategoriesLoading } = useCategories();
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/categories/get-all`);
-                setCategories(response.data);
-            } catch (error) {
-                console.error('Error fetching categories:', error);
-            } finally {
-                setIsCategoriesLoading(false);
-            }
-        }
-        fetchCategories();
-    }, []);
 
     const handleEdit = (id: number) => {
         // Navigate to edit page or open edit modal
@@ -89,17 +71,18 @@ export function RecentTransactions() {
 
     const formatAmount = (amount: number | string) => {
         const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-        
-        if (numAmount >= 1000) {
-            return `${(numAmount / 1000).toFixed(1)}k`;
-        } else if (numAmount >= 100) {
-            return numAmount.toFixed(0);
-        } else {
-            return numAmount.toFixed(1);
+        if (!numAmount) {
+            return '0';
         }
+
+        return Number(numAmount).toLocaleString('th-TH', {
+            style: 'currency',
+            currency: 'THB',
+            minimumFractionDigits: 0,
+        });
     }
 
-    if (isLoading || isCategoriesLoading) {
+    if (isTransactionsLoading || isCategoriesLoading) {
         return (
             <Card>
                 <CardHeader>
@@ -167,13 +150,13 @@ export function RecentTransactions() {
                                     category && getCategoryColor(category.name)
                                 )}>
                                     <AvatarFallback>
-                                        {category?.name.slice(0, 2)}
+                                        {getCategoryIcon(category?.name || '')}
                                     </AvatarFallback>
                                 </Avatar>
 
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center space-x-2">
-                                        <p className="font-medium truncate">{transaction.description || 'ไม่มีคำอธิบาย'}</p>
+                                        <p className="font-medium truncate">{transaction.description || 'N/A'}</p>
                                         {transaction.is_recurring && (
                                             <Badge variant="secondary" className="text-xs">
                                                 รายเดือน
@@ -223,7 +206,7 @@ export function RecentTransactions() {
                 </div>
             </CardContent>
             <CardFooter className="border-t pt-4">
-                <Button variant="ghost" className="w-full gap-2">
+                <Button variant="ghost" className="w-full gap-2 cursor-pointer" onClick={() => router.push('/transactions')}>
                     ดูรายการทั้งหมด
                     <ArrowRight className="h-4 w-4" />
                 </Button>

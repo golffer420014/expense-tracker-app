@@ -65,7 +65,7 @@ export function BottomNavbar() {
             </div>
 
             {/* Navigation Bar */}
-            <div className="bg-background/80 backdrop-blur-lg rounded-2xl border border-border shadow-lg">
+            <div className="bg-background/80 backdrop-blur-lg rounded-t-2xl border border-border shadow-lg">
               <div className="flex justify-between items-center h-20 px-6">
                 {routes.map((route) => {
                   const isActive = pathname === route.path

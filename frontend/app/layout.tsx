@@ -6,6 +6,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/context/auth-context";
 import { TransactionsProvider } from "@/lib/context/transactions-context";
 import { ThemeProvider } from "@/lib/context/theme-provider";
+import { CategoriesProvider } from "@/lib/context/categories-context";
 import { ModeToggle } from "@/components/mode-toggle";
 
 const geistSans = Geist({
@@ -35,11 +36,12 @@ export default function RootLayout({
       >
         <AuthProvider>
           <TransactionsProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
+            <CategoriesProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
             >
               <header className="sticky top-0 z-10 bg-background border-b">
                 <div className="container max-w-md mx-auto p-4 flex items-center justify-between">
@@ -48,7 +50,8 @@ export default function RootLayout({
                 </div>
               </header>
               {children}
-            </ThemeProvider>
+              </ThemeProvider>
+            </CategoriesProvider>
           </TransactionsProvider>
         </AuthProvider>
         <Toaster richColors position="top-right" />

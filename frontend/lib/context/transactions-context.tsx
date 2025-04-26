@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useAuth } from './auth-context';
@@ -16,35 +16,47 @@ interface Transaction {
   date: Date;
 }
 
-// {
-//     "type": "expense",
-//     "amount": "100",
-//     "category": "food",
-//     "description": "jioji",
-//     "date": "2025-04-22T15:30:41.482Z"
-// }
+interface Summary {
+  user_id: string;
+  total_income: string;
+  total_expense: string;
+  balance: string;
+  month: string;
+  year: string;
+}
 
 interface TransactionsContextType {
   transactions: Transaction[];
+  summary: Summary;
   isLoading: boolean;
-//   createTransaction: (data: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  //   createTransaction: (data: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<void>;
   createTransaction: (data: Transaction) => Promise<void>;
   updateTransaction: (id: number, data: Partial<Transaction>) => Promise<void>;
   deleteTransaction: (id: number) => Promise<void>;
-  getTransactions: () => Promise<void>;
-  getTransactionById: (id: number) => Promise<Transaction | null>;
+  getTransactions: (search?: string) => Promise<void>;
+  getUserMonthlySummary: (month: number, year: number) => Promise<void>;
 }
 
 const TransactionsContext = createContext<TransactionsContextType | undefined>(undefined);
 
 export function TransactionsProvider({ children }: { children: React.ReactNode }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [summary, setSummary] = useState<Summary>({
+    user_id: '',
+    total_income: '0',
+    total_expense: '0',
+    balance: '0',
+    month: '',
+    year: ''
+  });
   const [isLoading, setIsLoading] = useState(true);
   const { getToken } = useAuth();
 
-  const getTransactions = async () => {
+  const getTransactions = async (search?: string) => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/transactions/get-all`, {
+      setIsLoading(true);
+      const route = search ? `/transactions/get-all?search=${search}` : '/transactions/get-all';
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}${route}`, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
@@ -54,6 +66,7 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
       console.error('Error fetching transactions:', error);
       toast.error('ไม่สามารถดึงข้อมูลรายการได้');
     } finally {
+      await new Promise(resolve => setTimeout(resolve, 500));
       setIsLoading(false);
     }
   };
@@ -117,33 +130,37 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
     }
   };
 
-  const getTransactionById = async (id: number): Promise<Transaction | null> => {
+
+
+  // _____________
+
+  const getUserMonthlySummary = async (month: number, year: number) => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/transactions/get-by-id/${id}`, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/transactions/get-user-monthly-summary`, {
+        month,
+        year,
+      }, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
       });
-      return response.data;
+      setSummary(response.data);
     } catch (error) {
-      console.error('Error fetching transaction:', error);
+      console.error('Error fetching user monthly summary:', error);
       toast.error('ไม่สามารถดึงข้อมูลรายการได้');
-      return null;
     }
-  };
+  }
 
-  useEffect(() => {
-    getTransactions();
-  }, []);
 
   const value = {
     transactions,
+    summary,
     isLoading,
     createTransaction,
     updateTransaction,
     deleteTransaction,
     getTransactions,
-    getTransactionById,
+    getUserMonthlySummary,
   };
 
   return (

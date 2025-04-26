@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { create, getAll, getById, update, remove } = require('../controllers/transactions-controller');
+const { create, getAll, getById, update, remove, getUserMonthlySummary } = require('../controllers/transactions-controller');
 // const authMiddleware = require('../middleware/auth');
 
 // Apply auth middleware to all transaction routes
@@ -20,5 +20,7 @@ router.put('/update-transaction/:id', update);
 
 // DELETE /transactions/:id - Delete a transaction
 router.delete('/remove-transaction/:id', remove);
+
+router.post('/get-user-monthly-summary', getUserMonthlySummary);
 
 module.exports = router; 
