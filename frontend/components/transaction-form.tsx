@@ -90,8 +90,8 @@ export function TransactionForm({ onSuccess, initialData }: TransactionFormProps
         type: values.type,
         amount: parseFloat(values.amount),
         category_id: parseInt(values.category),
-        description: values.description,
-        note: values.note,
+        description: values.description ? values.description : values.category,
+        note: values.note ? values.note : "",
         date: values.date,
         is_recurring: false,
       })

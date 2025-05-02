@@ -7,7 +7,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from "@/components/ui/input"
 import { useTransactions } from "@/lib/context/transactions-context"
 import { Skeleton } from "./ui/skeleton"
-import { useCategories } from "@/lib/context/categories-context"
 import { TransactionFilters } from "./transaction-filters"
 
 // Helper function to get icon by category
@@ -57,7 +56,6 @@ type Transaction = {
 
 export function TransactionsList() {
     const { isLoading, transactions } = useTransactions();
-    const { categories } = useCategories();
     const [model, setModel] = useState<Transaction[]>()
     const [searchTerm, setSearchTerm] = useState("")
 
@@ -70,7 +68,7 @@ export function TransactionsList() {
             id: t.id!, // Add non-null assertion since id is required
             description: t.description || 'N/A', // Provide default empty string
             amount: t.amount,
-            category: categories.find((c: { id: number, name: string }) => c.id === t.category_id)?.name ?? "ไม่มีหมวดหมู่",
+            category: t.category_name ?? "ไม่มีหมวดหมู่",
             date: t.date,
             isIncome: t.type === "income",
         })))

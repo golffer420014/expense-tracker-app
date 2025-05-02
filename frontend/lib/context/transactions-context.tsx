@@ -9,7 +9,8 @@ interface Transaction {
   id?: number;
   type: 'expense' | 'income';
   amount: number;
-  category_id: number;
+  category_name?: string; // case get
+  category_id?: number; // case post
   description?: string;
   note?: string;
   is_recurring: boolean;
@@ -18,11 +19,15 @@ interface Transaction {
 
 interface Summary {
   user_id: string;
-  total_income: string;
-  total_expense: string;
-  balance: string;
-  month: string;
-  year: string;
+  year: number;
+  month: number;
+  total_income: number;
+  total_expense: number;
+  balance: number;
+  total_days_in_month: number;
+  today: number;
+  days_left: number;
+  avg_daily_budget_left: number;
 }
 
 interface TransactionsContextType {
@@ -43,17 +48,24 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<Summary>({
     user_id: '',
-    total_income: '0',
-    total_expense: '0',
-    balance: '0',
-    month: '',
-    year: ''
+    total_income: 0,
+    total_expense: 0,
+    balance: 0,
+    month: 0,
+    year: 0,
+    total_days_in_month: 0,
+    today: 0,
+    days_left: 0,
+    avg_daily_budget_left: 0
   });
   const [isLoading, setIsLoading] = useState(true);
   const { getToken } = useAuth();
 
   const getTransactions = async (search?: string) => {
     try {
+      if (!getToken()) {
+        return;
+      }
       setIsLoading(true);
       const route = search ? `/transactions/get-all?search=${search}` : '/transactions/get-all';
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}${route}`, {
@@ -136,6 +148,9 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
 
   const getUserMonthlySummary = async (month: number, year: number) => {
     try {
+      if (!getToken()) {
+        return;
+      }
       const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/transactions/get-user-monthly-summary`, {
         month,
         year,

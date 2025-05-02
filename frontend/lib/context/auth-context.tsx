@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { showToast } from '@/lib/utils/toast';
 import axios from 'axios';
 
@@ -27,33 +27,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
+
+  const checkAuth = async () => {
+    try {
+      console.log('checkAuth');
+      const token = localStorage.getItem('token');
+      if (!token) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        showToast.error('session expired please login again.');
+        router.push('/');
+        return;
+      }
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.status === 200) {
+        setUser(response.data);
+      } else {
+        localStorage.removeItem('token');
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Check if user is logged in on initial load
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (token) {
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          if (response.status === 200) {
-            setUser(response.data);
-          } else {
-            localStorage.removeItem('token');
-          }
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
+    // Check auth on initial load and route changes
     checkAuth();
-  }, []);
+  }, [pathname]);
 
   const register = async (username: string, name: string, password: string) => {
     try {
@@ -110,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     logout,
     getToken,
     isAuthenticated: !!user,
-  
+
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { useCategories } from "@/lib/context/categories-context"
+
 const getCategoryIcon = (category: string) => {
     switch (category) {
         case "อาหาร":
@@ -51,7 +52,7 @@ const getCategoryColor = (category: string) => {
 export function RecentTransactions() {
     const router = useRouter()
     const { transactions, isLoading: isTransactionsLoading } = useTransactions();
-    const { categories, isLoading: isCategoriesLoading } = useCategories();
+    const { isLoading: isCategoriesLoading } = useCategories();
 
 
     const handleEdit = (id: number) => {
@@ -123,7 +124,6 @@ export function RecentTransactions() {
                         </p>
                         <Button variant="outline" className="gap-2">
                             เพิ่มรายการใหม่
-                            <ArrowRight className="h-4 w-4" />
                         </Button>
                     </div>
                 </CardContent>
@@ -138,8 +138,18 @@ export function RecentTransactions() {
             </CardHeader>
             <CardContent>
                 <div className="space-y-4">
-                    {transactions.slice(0, 5).map((transaction) => {
-                        const category = categories.find((c) => c.id === transaction.category_id);
+                    {transactions
+                        .filter(transaction => {
+                            // Filter transactions for current month
+                            const currentDate = new Date();
+                            const transactionDate = new Date(transaction.date);
+                            return (
+                                transactionDate.getMonth() === currentDate.getMonth() &&
+                                transactionDate.getFullYear() === currentDate.getFullYear()
+                            );
+                        })
+                        .slice(0, 5)
+                        .map((transaction) => {
                         return (
                             <div
                                 key={transaction.id || 0}
@@ -147,10 +157,10 @@ export function RecentTransactions() {
                             >
                                 <Avatar className={cn(
                                     "h-10 w-10 transition-transform group-hover:scale-110",
-                                    category && getCategoryColor(category.name)
+                                    transaction.category_name && getCategoryColor(transaction.category_name)
                                 )}>
                                     <AvatarFallback>
-                                        {getCategoryIcon(category?.name || '')}
+                                        {getCategoryIcon(transaction?.category_name || '')}
                                     </AvatarFallback>
                                 </Avatar>
 
@@ -166,7 +176,7 @@ export function RecentTransactions() {
                                     <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                                         <span>{formatDate(transaction.date)}</span>
                                         <span>•</span>
-                                        <span>{category?.name || 'ไม่มีหมวดหมู่'}</span>
+                                        <span>{transaction.category_name || 'ไม่มีหมวดหมู่'}</span>
                                     </div>
                                 </div>
 

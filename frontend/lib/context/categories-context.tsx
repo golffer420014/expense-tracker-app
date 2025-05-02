@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { showToast } from '@/lib/utils/toast';
 import axios from 'axios';
+import { useAuth } from './auth-context';
 
 interface categories {
   id: number;
@@ -24,19 +25,22 @@ const CategoriesContext = createContext<CategoriesContextType | undefined>(undef
 export function CategoriesProvider({ children }: { children: React.ReactNode }) {
   const [categories, setCategories] = useState<categories[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const { getToken } = useAuth();
 
   const getCategories = async () => {
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/categories/get-all`);
-        setCategories(response.data);
+      if (!getToken()) {
+        return;
+      }
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/categories/get-all`);
+      setCategories(response.data);
     } catch (error) {
-        showToast.error('ไม่สามารถดึงข้อมูลหมวดหมู่ได้');
-        console.error('Error fetching categories:', error);
+      showToast.error('ไม่สามารถดึงข้อมูลหมวดหมู่ได้');
+      console.error('Error fetching categories:', error);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-}
+  }
 
   useEffect(() => {
     getCategories();

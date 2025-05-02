@@ -8,7 +8,6 @@ import { Skeleton } from "./ui/skeleton";
 export function MonthSummary() {
   const { isLoading, summary } = useTransactions();
 
-
   const formatNumber = (value: string) => {
     if (!value) return '0';
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -24,7 +23,7 @@ export function MonthSummary() {
     return (
       <Card className="overflow-hidden !p-0">
         <CardContent className="!p-0">
-          <div className="grid grid-cols-3 divide-x">
+          <div className="grid grid-cols-4 divide-x">
             <div className="p-4 flex flex-col items-center">
               <span className="text-sm text-muted-foreground mb-1">รายรับ</span>
               <div className="flex items-center">
@@ -43,6 +42,13 @@ export function MonthSummary() {
               <span className="text-sm text-muted-foreground mb-1">คงเหลือ</span>
               <Skeleton className="h-[24px] w-16" />
             </div>
+
+            <div className="p-4 flex flex-col items-center">
+              <span className="text-sm text-muted-foreground mb-1">งบประมาณ</span>
+              <div className="flex items-center">
+                <Skeleton className="h-[24px] w-16" />
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -52,28 +58,40 @@ export function MonthSummary() {
   return (
     <Card className="overflow-hidden !p-0">
       <CardContent className="!p-0">
-        <div className="grid grid-cols-3 divide-x">
+        <div className="grid grid-cols-3 divide-x divide-y">
+          {/* รายรับ */}
           <div className="p-4 flex flex-col items-center">
             <span className="text-sm text-muted-foreground mb-1">รายรับ</span>
             <div className="flex items-center">
               <ArrowUpIcon className="h-4 w-4 mr-1 text-green-500" />
-              <span className="font-semibold">{formatNumber(summary.total_income ?? '0')}</span>
+              <span className="font-semibold">{formatNumber(summary.total_income.toString())}</span>
             </div>
           </div>
 
+          {/* รายจ่าย */}
           <div className="p-4 flex flex-col items-center">
             <span className="text-sm text-muted-foreground mb-1">รายจ่าย</span>
             <div className="flex items-center">
               <ArrowDownIcon className="h-4 w-4 mr-1 text-red-500" />
-              <span className="font-semibold">{formatNumber(summary.total_expense ?? '0')}</span>
+              <span className="font-semibold">{formatNumber(summary.total_expense.toString())}</span>
             </div>
           </div>
 
+          {/* คงเหลือ */}
           <div className="p-4 flex flex-col items-center">
             <span className="text-sm text-muted-foreground mb-1">คงเหลือ</span>
             <span className={`font-semibold ${Number(summary.balance) >= 0 ? "text-green-600" : "text-red-600"}`}>
-              {formatNumber(summary.balance ?? '0')}
+              {formatNumber(summary.balance.toString())}
             </span>
+          </div>
+
+          {/* งบประมาณ */}
+          <div className="col-span-3 p-4 flex flex-col items-center">
+            <span className="text-sm text-muted-foreground mb-1">งบประมาณ</span>
+            <div className="flex items-center">
+              <span className="font-semibold">{formatNumber(summary.avg_daily_budget_left.toString())}</span>
+              <span className="text-sm text-muted-foreground ml-1">ต่อวัน</span>
+            </div>
           </div>
         </div>
       </CardContent>

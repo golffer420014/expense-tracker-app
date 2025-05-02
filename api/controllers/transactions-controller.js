@@ -4,6 +4,9 @@ const transactionSchema = new Schema('transactions');
 const categorySchema = new Schema('categories');
 const userSchema = new Schema('users');
 const _vm_user_monthly_summary = new Schema('user_monthly_summary');
+const _vm_user_transition_list = new Schema('user_transition_list');
+
+// user_transition_list
 
 const create = async (req, res) => {
     try {
@@ -68,7 +71,7 @@ const getAll = async (req, res) => {
             }
         }
 
-        const transactions = await transactionSchema.find(query);
+        const transactions = await _vm_user_transition_list.find(query);
         res.status(200).json(transactions.sort((a, b) => new Date(b.date) - new Date(a.date)));
     } catch (error) {
         console.error('Error getting transactions:', error);

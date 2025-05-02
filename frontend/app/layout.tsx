@@ -8,6 +8,7 @@ import { TransactionsProvider } from "@/lib/context/transactions-context";
 import { ThemeProvider } from "@/lib/context/theme-provider";
 import { CategoriesProvider } from "@/lib/context/categories-context";
 import { ModeToggle } from "@/components/mode-toggle";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,7 +46,9 @@ export default function RootLayout({
             >
               <header className="sticky top-0 z-10 bg-background border-b">
                 <div className="container max-w-md mx-auto p-4 flex items-center justify-between">
-                  <h1 className="text-xl font-bold">Expense Tracker</h1>
+                  <Link href="/dashboard">
+                    <h1 className="text-xl font-bold cursor-pointer">Expense Tracker</h1>
+                  </Link>
                   <ModeToggle />
                 </div>
               </header>
