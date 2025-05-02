@@ -139,15 +139,15 @@ export function RecentTransactions() {
             <CardContent>
                 <div className="space-y-4">
                     {transactions
-                        .filter(transaction => {
-                            // Filter transactions for current month
-                            const currentDate = new Date();
-                            const transactionDate = new Date(transaction.date);
-                            return (
-                                transactionDate.getMonth() === currentDate.getMonth() &&
-                                transactionDate.getFullYear() === currentDate.getFullYear()
-                            );
-                        })
+                        // .filter(transaction => {
+                        //     // Filter transactions for current month
+                        //     const currentDate = new Date();
+                        //     const transactionDate = new Date(transaction.date);
+                        //     return (
+                        //         transactionDate.getMonth() === currentDate.getMonth() &&
+                        //         transactionDate.getFullYear() === currentDate.getFullYear()
+                        //     );
+                        // })
                         .slice(0, 5)
                         .map((transaction) => {
                         return (

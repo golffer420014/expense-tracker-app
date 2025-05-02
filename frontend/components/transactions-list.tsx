@@ -7,7 +7,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from "@/components/ui/input"
 import { useTransactions } from "@/lib/context/transactions-context"
 import { Skeleton } from "./ui/skeleton"
-import { TransactionFilters } from "./transaction-filters"
 
 // Helper function to get icon by category
 const getCategoryIcon = (category: string) => {
@@ -55,13 +54,17 @@ type Transaction = {
 }
 
 export function TransactionsList() {
-    const { isLoading, transactions } = useTransactions();
+    const { isLoading, transactions , getTransactions } = useTransactions();
     const [model, setModel] = useState<Transaction[]>()
     const [searchTerm, setSearchTerm] = useState("")
 
     useEffect(() => {
         setInitialModel()
     }, [transactions])
+
+    useEffect(() => {
+        getTransactions('')
+    }, [])
 
     const setInitialModel = () => {
         setModel(transactions.map((t) => ({
@@ -122,7 +125,6 @@ export function TransactionsList() {
 
     return (
         <div className="space-y-4">
-            <TransactionFilters model={model ?? []} setInitialModel={setInitialModel} setModel={setModel} />
             <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
                 <Input

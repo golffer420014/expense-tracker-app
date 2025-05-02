@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -9,47 +9,15 @@ import { CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 import { useCategories } from "@/lib/context/categories-context"
 
-type Transaction = {
-  id: number
-  description: string
-  amount: number
-  category: string
-  date: Date
-  isIncome: boolean
-}
 
-export function TransactionFilters({
-  model,
-  setModel,
-  setInitialModel
-}
-  :
-  { model: Transaction[], setModel: (model: Transaction[]) => void, setInitialModel: () => void }
+
+export function TransactionFilters(
 ) {
   const { categories } = useCategories()
   const [date, setDate] = useState<Date | undefined>(undefined)
   const [category, setCategory] = useState<string>("all")
   const [type, setType] = useState<string>("")
 
-  const tempModel = model
-
-
-  const resetFilters = () => {
-    setDate(undefined)
-    setCategory("all")
-    setType("")
-
-    setInitialModel()
-  }
-
-  const handleTypeChange = (type: string) => {
-    setType(type)
-    setModel(tempModel.filter((transaction: Transaction) => transaction.isIncome ? type === "income" : type === "expense"))
-  }
-
-  useEffect(() => {
-    handleTypeChange(type)
-  }, [type])
 
   return (
     <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -96,7 +64,7 @@ export function TransactionFilters({
       </Select>
 
       {(date || category || type) && (
-        <Button variant="ghost" size="sm" className="h-8 px-2" onClick={resetFilters}>
+        <Button variant="ghost" size="sm" className="h-8 px-2">
           รีเซ็ต
         </Button>
       )}

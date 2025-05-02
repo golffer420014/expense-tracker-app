@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { useTransactions } from "@/lib/context/transactions-context";
 
 export function MonthSelector() {
-  const { getUserMonthlySummary, getTransactions , isLoading } = useTransactions();
+  const { getUserMonthlySummary, getTransactions , isLoading  } = useTransactions();
   const [currentDate, setCurrentDate] = useState(new Date())
 
   const formatMonth = (date: Date) => {
