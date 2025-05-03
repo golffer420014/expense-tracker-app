@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input"
 import { useTransactions } from "@/lib/context/transactions-context"
 import { Skeleton } from "./ui/skeleton"
 import { Button } from "@/components/ui/button"
+import { TransactionForm } from "./transaction-form"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 
 // Helper function to get icon by category
 const getCategoryIcon = (category: string) => {
@@ -54,12 +57,29 @@ type Transaction = {
     isIncome: boolean
 }
 
+// Define properly typed formData interface
+interface TransactionFormData {
+  type: "expense" | "income";
+  amount: string;
+  category: string;
+  description?: string;
+  note?: string;
+  date: Date;
+}
+
 export function TransactionsList() {
-    const { isLoading, transactions, filteredTransactions, getTransactions, showMoney } = useTransactions();
+    const { isLoading, transactions, filteredTransactions, getTransactions, showMoney, deleteTransaction } = useTransactions();
     const [model, setModel] = useState<Transaction[]>()
     const [searchTerm, setSearchTerm] = useState("")
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 8
+    const [editingTransactionId, setEditingTransactionId] = useState<number | undefined>(undefined)
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [formData, setFormData] = useState<TransactionFormData | undefined>(undefined)
+    
+    // Add state for delete confirmation
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+    const [deletingTransactionId, setDeletingTransactionId] = useState<number | undefined>(undefined)
 
     useEffect(() => {
         setInitialModel()
@@ -68,6 +88,25 @@ export function TransactionsList() {
     useEffect(() => {
         getTransactions('')
     }, [])
+
+    // Set form data when editing transaction is selected
+    useEffect(() => {
+        if (editingTransactionId) {
+            const transaction = transactions.find(t => t.id === editingTransactionId);
+            if (transaction) {
+                setFormData({
+                    type: transaction.type,
+                    amount: transaction.amount.toString(),
+                    category: transaction.category_id?.toString() || "",
+                    description: transaction.description || "",
+                    note: transaction.note || "",
+                    date: new Date(transaction.date),
+                });
+            }
+        } else {
+            setFormData(undefined);
+        }
+    }, [editingTransactionId, transactions]);
 
     const setInitialModel = () => {
         setModel(transactions.map((t) => ({
@@ -81,13 +120,42 @@ export function TransactionsList() {
     }
 
     const handleEdit = (id: number) => {
-        // Navigate to edit page or open edit modal
-        console.log("Edit transaction", id)
+        setEditingTransactionId(id)
+        setIsDialogOpen(true)
     }
 
-    const handleDelete = (id: number) => {
-        // Delete transaction
-        setModel(model?.filter((t) => t.id !== id))
+    const handleDelete = async (id: number) => {
+        // Open confirmation dialog instead of deleting directly
+        setDeletingTransactionId(id)
+        setIsDeleteDialogOpen(true)
+    }
+    
+    // Create function to handle actual deletion after confirmation
+    const confirmDelete = async () => {
+        if (deletingTransactionId) {
+            try {
+                await deleteTransaction(deletingTransactionId)
+                setModel(model?.filter((t) => t.id !== deletingTransactionId))
+            } catch (error) {
+                console.error("Error deleting transaction:", error)
+            } finally {
+                closeDeleteDialog()
+            }
+        }
+    }
+    
+    // Function to close delete dialog
+    const closeDeleteDialog = () => {
+        setIsDeleteDialogOpen(false)
+        setDeletingTransactionId(undefined)
+    }
+
+    const handleDialogClose = () => {
+        setIsDialogOpen(false)
+        setEditingTransactionId(undefined)
+        setFormData(undefined)
+        // Refresh transactions after editing
+        getTransactions('')
     }
 
     const formatDate = (dateString: Date) => {
@@ -278,6 +346,28 @@ export function TransactionsList() {
                     </div>
                 )}
             </Card>
+
+            <Dialog open={isDialogOpen} onOpenChange={(open) => !open && handleDialogClose()}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>{editingTransactionId ? "แก้ไขรายการ" : "เพิ่มรายการใหม่"}</DialogTitle>
+                    </DialogHeader>
+                    <TransactionForm 
+                        onSuccess={handleDialogClose}
+                        initialData={formData}
+                        isEditId={editingTransactionId}
+                    />
+                </DialogContent>
+            </Dialog>
+            
+            {/* Add delete confirmation dialog */}
+            <ConfirmDeleteDialog
+                isOpen={isDeleteDialogOpen}
+                onClose={closeDeleteDialog}
+                onConfirm={confirmDelete}
+                title="ยืนยันการลบรายการ"
+                description="คุณต้องการลบรายการนี้หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้"
+            />
         </div>
     )
 }

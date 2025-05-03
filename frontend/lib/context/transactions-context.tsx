@@ -34,15 +34,15 @@ interface TransactionsContextType {
   transactions: Transaction[];
   summary: Summary;
   filteredTransactions: Filter;
-  setFilteredTransactions: (filteredTransactions: Filter) => void;
+  showMoney: boolean;
   isLoading: boolean;
+  setFilteredTransactions: (filteredTransactions: Filter) => void;
   //   createTransaction: (data: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<void>;
   createTransaction: (data: Transaction) => Promise<void>;
   updateTransaction: (id: number, data: Partial<Transaction>) => Promise<void>;
   deleteTransaction: (id: number) => Promise<void>;
   getTransactions: (search?: string) => Promise<void>;
   getUserMonthlySummary: (month: number, year: number) => Promise<void>;
-  showMoney: boolean;
   toggleShowMoney: () => void;
 }
 
@@ -139,7 +139,7 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
   const updateTransaction = async (id: number, data: Partial<Transaction>) => {
     try {
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/transactions/update/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/transactions/update-transaction/${id}`,
         data,
         {
           headers: {
@@ -160,7 +160,7 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
 
   const deleteTransaction = async (id: number) => {
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/transactions/delete/${id}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/transactions/remove-transaction/${id}`, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
@@ -200,14 +200,14 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
     transactions,
     summary,
     filteredTransactions,
-    setFilteredTransactions,
+    showMoney,
     isLoading,
+    setFilteredTransactions,
     createTransaction,
     updateTransaction,
     deleteTransaction,
     getTransactions,
     getUserMonthlySummary,
-    showMoney,
     toggleShowMoney,
   };
 

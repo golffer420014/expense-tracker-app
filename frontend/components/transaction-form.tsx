@@ -44,11 +44,12 @@ interface categories {
 type TransactionFormProps = {
   onSuccess: () => void
   initialData?: z.infer<typeof formSchema>
+  isEditId?: number
 }
 
-export function TransactionForm({ onSuccess, initialData }: TransactionFormProps) {
+export function TransactionForm({ onSuccess, initialData, isEditId }: TransactionFormProps) {
   const { categories } = useCategories();
-  const { createTransaction } = useTransactions();
+  const { createTransaction, updateTransaction } = useTransactions();
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [expenseCategories, setExpenseCategories] = useState<categories[]>([])
@@ -86,22 +87,38 @@ export function TransactionForm({ onSuccess, initialData }: TransactionFormProps
     setIsSubmitting(true)
 
     try {
-      await createTransaction({
-        type: values.type,
-        amount: parseFloat(values.amount),
-        category_id: parseInt(values.category),
-        description: values.description ? values.description : values.category,
-        note: values.note ? values.note : "",
-        date: values.date,
-        is_recurring: false,
-      })
-      toast.success("บันทึกรายการสำเร็จ")
+      if (isEditId) {
+        // ถ้าเป็นการแก้ไข
+        await updateTransaction(isEditId, {
+          type: values.type,
+          amount: parseFloat(values.amount),
+          category_id: parseInt(values.category),
+          description: values.description ? values.description : values.category,
+          note: values.note ? values.note : "",
+          date: values.date,
+          is_recurring: false,
+        })
+        toast.success("อัปเดตรายการสำเร็จ")
+      } else {
+        // ถ้าเป็นการสร้างใหม่
+        await createTransaction({
+          type: values.type,
+          amount: parseFloat(values.amount),
+          category_id: parseInt(values.category),
+          description: values.description ? values.description : values.category,
+          note: values.note ? values.note : "",
+          date: values.date,
+          is_recurring: false,
+        })
+        toast.success("บันทึกรายการสำเร็จ")
+      }
+      
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000))
-
       onSuccess()
     } catch (error) {
       console.error("Error saving transaction:", error)
+      toast.error("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง")
     } finally {
       setIsSubmitting(false)
     }
@@ -240,7 +257,7 @@ export function TransactionForm({ onSuccess, initialData }: TransactionFormProps
               ยกเลิก
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "กำลังบันทึก..." : "บันทึก"}
+              {isSubmitting ? "กำลังบันทึก..." : isEditId ? "แก้ไข" : "บันทึก"}
             </Button>
           </div>
         </form>
