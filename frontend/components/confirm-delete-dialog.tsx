@@ -41,7 +41,7 @@ export function ConfirmDeleteDialog({
 
 
 
-                <div className="flex justify-end gap-3 mx-4">
+                <div className="flex justify-end gap-3 mx-4 pb-4">
                     <Button variant="outline" onClick={onClose}>
                         ยกเลิก
                     </Button>

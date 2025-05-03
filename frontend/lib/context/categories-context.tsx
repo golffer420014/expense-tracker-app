@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { showToast } from '@/lib/utils/toast';
+import { showToast } from '@/lib/toast';
 import axios from 'axios';
 import { useAuth } from './auth-context';
 

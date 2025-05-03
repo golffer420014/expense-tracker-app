@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { TransactionForm } from "./transaction-form"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
+import { formatAmount } from "@/lib/utils"
 
 // Helper function to get icon by category
 const getCategoryIcon = (category: string) => {
@@ -286,16 +287,7 @@ export function TransactionsList() {
                                 <div className="flex items-center">
                                     <span className={`font-medium ${transaction.isIncome ? "text-green-600" : "text-red-600"}`}>
                                         {transaction.isIncome ? "+" : "-"}
-                                        {showMoney 
-                                            ? transaction.amount 
-                                                ? Number(transaction.amount).toLocaleString('th-TH', {
-                                                    style: 'currency',
-                                                    currency: 'THB',
-                                                    minimumFractionDigits: 0,
-                                                  }) 
-                                                : "0"
-                                            : "••••••"
-                                        }
+                                        {formatAmount(transaction.amount, showMoney)}
                                     </span>
 
                                     <DropdownMenu>
@@ -316,7 +308,9 @@ export function TransactionsList() {
                             </div>
                         ))
                     ) : (
-                        <div className="p-6 text-center text-muted-foreground">ไม่พบรายการที่ค้นหา</div>
+                        <div className="p-6 text-center text-muted-foreground">
+                            {searchTerm ? "ไม่พบรายการที่ค้นหา" : "ไม่มีรายการที่ต้องแสดง"}
+                        </div>
                     )}
                 </div>
                 

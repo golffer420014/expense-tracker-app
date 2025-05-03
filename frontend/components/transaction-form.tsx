@@ -105,7 +105,7 @@ export function TransactionForm({ onSuccess, initialData, isEditId }: Transactio
           type: values.type,
           amount: parseFloat(values.amount),
           category_id: parseInt(values.category),
-          description: values.description ? values.description : values.category,
+          description: values.description ? values.description : categories.find((category: categories) => category.id === parseInt(values.category))?.name,
           note: values.note ? values.note : "",
           date: values.date,
           is_recurring: false,

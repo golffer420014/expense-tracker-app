@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { showToast } from '@/lib/utils/toast';
+import { showToast } from '@/lib/toast';
 import axios from 'axios';
 
 type User = {

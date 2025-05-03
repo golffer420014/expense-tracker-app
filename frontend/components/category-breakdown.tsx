@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { useTransactions } from "@/lib/context/transactions-context"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ShoppingBag } from "lucide-react"
+import { formatAmount } from "@/lib/utils"
 
 type CategoryData = {
     name: string
@@ -30,18 +31,13 @@ const CustomTooltip = ({ active, payload }: { active: boolean, payload: { value:
     if (active && payload && payload.length) {
         return (
             <div className="bg-background text-foreground p-2 rounded-md shadow-md">
-                <p className="label">{`จำนวนเงิน : ${showMoney ? formatAmount(payload[0].value) : '••••••'} บาท`}</p>
+                <p className="label">{`จำนวนเงิน : ${formatAmount(payload[0].value, showMoney)} บาท`}</p>
             </div>
         );
     }
 }
 
-const formatAmount = (amount: number) => {
-    return amount.toLocaleString('th-TH', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-}
+
 
 export function CategoryBreakdown() {
     const { transactions, isLoading, showMoney } = useTransactions()
@@ -173,7 +169,7 @@ export function CategoryBreakdown() {
                             </div>
                             <div className="flex items-center space-x-3">
                                 <span className="font-medium">
-                                    {showMoney ? formatAmount(category.value) : '••••••'}
+                                    {formatAmount(category.value, showMoney)}
                                 </span>
                                 <span className="text-sm text-muted-foreground min-w-[50px] text-right">
                                     {((category.value / total) * 100).toFixed(1)}%

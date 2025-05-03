@@ -6,7 +6,7 @@ import { useTransactions } from "@/lib/context/transactions-context"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { cn, formatAmount } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { useCategories } from "@/lib/context/categories-context"
@@ -59,18 +59,11 @@ export function RecentTransactions() {
         return date.toLocaleDateString("th-TH", { day: "numeric", month: "short" })
     }
 
-    const formatAmount = (amount: number) => {
-        if (!showMoney) return '••••••';
-        return amount.toLocaleString('th-TH', {
-            style: 'currency',
-            currency: 'THB',
-            minimumFractionDigits: 0,
-        })
-    }
+
 
     if (isTransactionsLoading || isCategoriesLoading) {
         return (
-            <Card>
+            <Card className="!pt-6">
                 <CardHeader>
                     <CardTitle>รายการล่าสุด</CardTitle>
                 </CardHeader>
@@ -94,7 +87,7 @@ export function RecentTransactions() {
 
     if (transactions.length === 0) {
         return (
-            <Card className="!p-0 !py-0">
+            <Card className="!pt-6">
                 <CardHeader>
                     <CardTitle>รายการล่าสุด</CardTitle>
                 </CardHeader>
@@ -175,10 +168,10 @@ export function RecentTransactions() {
                                         ) : (
                                             <Minus className="h-4 w-4 mr-1" />
                                         )}
-                                        {formatAmount(transaction.amount)}
+                                        {formatAmount(transaction.amount, showMoney)}
                                     </div>
 
-                                    
+
                                 </div>
                             </div>
                         );

@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Eye, EyeOff, Lock, User,IdCard } from "lucide-react"
-import { showToast } from "@/lib/utils/toast"
+import { showToast } from "@/lib/toast"
 import { useAuth } from "@/lib/context/auth-context";
 
 export default function AuthTabs() {

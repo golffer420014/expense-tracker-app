@@ -47,7 +47,11 @@ export default function RootLayout({
                 <header className="sticky top-0 z-10 bg-background border-b">
                   <div className="container max-w-md mx-auto p-4 flex items-center justify-between">
                     <Link href="/dashboard">
-                      <h1 className="text-xl font-bold cursor-pointer">Expense Tracker</h1>
+                      <h1 className="text-xl font-bold cursor-pointer 
+                      bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text  text-transparent
+                      ">
+                        Expense Tracker
+                      </h1>
                     </Link>
                     <div className="flex items-center gap-2">
                       <MoneyVisibilityToggle />

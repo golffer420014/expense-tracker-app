@@ -4,21 +4,12 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useTransactions } from "@/lib/context/transactions-context";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react"
 import { Skeleton } from "./ui/skeleton";
+import { formatAmount } from "@/lib/utils";
 
 export function MonthSummary() {
   const { isLoading, summary, showMoney } = useTransactions();
 
-  const formatNumber = (value: number) => {
-    if (!showMoney) return '••••••';
-    if (!value) return '0';
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [integer, decimal] = value.toString().split('.');
-    return Number(integer).toLocaleString('th-TH', {
-      style: 'currency',
-      currency: 'THB',
-      minimumFractionDigits: 0,
-    });
-  }
+
 
   if (isLoading) {
     return (
@@ -57,7 +48,7 @@ export function MonthSummary() {
             <span className="text-sm text-muted-foreground mb-1">รายรับ</span>
             <div className="flex items-center">
               <ArrowUpIcon className="h-4 w-4 mr-1 text-green-500" />
-              <span className="font-semibold">{formatNumber(summary.total_income)}</span>
+              <span className="font-semibold">{formatAmount(summary.total_income, showMoney)}</span>
             </div>
           </div>
 
@@ -66,7 +57,7 @@ export function MonthSummary() {
             <span className="text-sm text-muted-foreground mb-1">รายจ่าย</span>
             <div className="flex items-center">
               <ArrowDownIcon className="h-4 w-4 mr-1 text-red-500" />
-              <span className="font-semibold">{formatNumber(summary.total_expense)}</span>
+              <span className="font-semibold">{formatAmount(summary.total_expense, showMoney)}</span>
             </div>
           </div>
 
@@ -74,7 +65,7 @@ export function MonthSummary() {
           <div className="p-4 flex flex-col items-center">
             <span className="text-sm text-muted-foreground mb-1">คงเหลือ</span>
             <span className={`font-semibold ${Number(summary.balance) >= 0 ? "text-green-600" : "text-red-600"}`}>
-              {formatNumber(summary.balance)}
+              {formatAmount(summary.balance, showMoney)}
             </span>
           </div>
 
@@ -82,7 +73,7 @@ export function MonthSummary() {
           <div className="col-span-3 p-4 flex flex-col items-center">
             <span className="text-sm text-muted-foreground mb-1">งบประมาณ</span>
             <div className="flex items-center">
-              <span className="font-semibold">{formatNumber(summary.avg_daily_budget_left)}</span>
+              <span className="font-semibold">{formatAmount(summary.avg_daily_budget_left, showMoney)}</span>
               <span className="text-sm text-muted-foreground ml-1">ต่อวัน</span>
             </div>
           </div>
