@@ -1,8 +1,7 @@
 "use client"
 
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
-import { ShoppingBag, MoreVertical, Plus, Minus, ArrowRight, Coffee, Bus, Home, Briefcase } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { ShoppingBag, Plus, Minus, ArrowRight, Coffee, Bus, Home, Briefcase } from "lucide-react"
 import { useTransactions } from "@/lib/context/transactions-context"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -51,36 +50,22 @@ const getCategoryColor = (category: string) => {
 
 export function RecentTransactions() {
     const router = useRouter()
-    const { transactions, isLoading: isTransactionsLoading } = useTransactions();
+    const { transactions, isLoading: isTransactionsLoading, showMoney } = useTransactions();
     const { isLoading: isCategoriesLoading } = useCategories();
 
-
-    const handleEdit = (id: number) => {
-        // Navigate to edit page or open edit modal
-        console.log("Edit transaction", id)
-    }
-
-    const handleDelete = (id: number) => {
-        // Delete transaction
-        console.log("Delete transaction", id)
-    }
 
     const formatDate = (dateString: Date) => {
         const date = new Date(dateString)
         return date.toLocaleDateString("th-TH", { day: "numeric", month: "short" })
     }
 
-    const formatAmount = (amount: number | string) => {
-        const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-        if (!numAmount) {
-            return '0';
-        }
-
-        return Number(numAmount).toLocaleString('th-TH', {
+    const formatAmount = (amount: number) => {
+        if (!showMoney) return '••••••';
+        return amount.toLocaleString('th-TH', {
             style: 'currency',
             currency: 'THB',
             minimumFractionDigits: 0,
-        });
+        })
     }
 
     if (isTransactionsLoading || isCategoriesLoading) {
@@ -109,11 +94,11 @@ export function RecentTransactions() {
 
     if (transactions.length === 0) {
         return (
-            <Card>
+            <Card className="!p-0 !py-0">
                 <CardHeader>
                     <CardTitle>รายการล่าสุด</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="!p-0 !py-0">
                     <div className="flex flex-col items-center justify-center py-12 text-center">
                         <div className="rounded-full bg-muted p-4 mb-4">
                             <ShoppingBag className="h-8 w-8 text-muted-foreground" />
@@ -132,12 +117,12 @@ export function RecentTransactions() {
     }
 
     return (
-        <Card>
+        <Card className=" !pb-0">
             <CardHeader>
                 <CardTitle>รายการล่าสุด</CardTitle>
             </CardHeader>
-            <CardContent>
-                <div className="space-y-4">
+            <CardContent className="!p-0">
+                <div className="">
                     {transactions
                         // .filter(transaction => {
                         //     // Filter transactions for current month
@@ -193,30 +178,15 @@ export function RecentTransactions() {
                                         {formatAmount(transaction.amount)}
                                     </div>
 
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger className="focus:outline-none">
-                                            <MoreVertical className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => handleEdit(transaction.id || 0)}>
-                                                แก้ไข
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={() => handleDelete(transaction.id || 0)}
-                                                className="text-red-600 focus:text-red-600"
-                                            >
-                                                ลบ
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                    
                                 </div>
                             </div>
                         );
                     })}
                 </div>
             </CardContent>
-            <CardFooter className="border-t pt-4">
-                <Button variant="ghost" className="w-full gap-2 cursor-pointer" onClick={() => router.push('/transactions')}>
+            <CardFooter className="border-t !p-0 !py-0">
+                <Button variant="ghost" className="w-full !py-6 gap-2 cursor-pointer" onClick={() => router.push('/transactions')}>
                     ดูรายการทั้งหมด
                     <ArrowRight className="h-4 w-4" />
                 </Button>

@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ShoppingBag, Coffee, Bus, Home, Briefcase, MoreVertical, Search } from "lucide-react"
+import { ShoppingBag, Coffee, Bus, Home, Briefcase, MoreVertical, Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { useTransactions } from "@/lib/context/transactions-context"
 import { Skeleton } from "./ui/skeleton"
+import { Button } from "@/components/ui/button"
 
 // Helper function to get icon by category
 const getCategoryIcon = (category: string) => {
@@ -54,9 +55,11 @@ type Transaction = {
 }
 
 export function TransactionsList() {
-    const { isLoading, transactions , getTransactions } = useTransactions();
+    const { isLoading, transactions, filteredTransactions, getTransactions, showMoney } = useTransactions();
     const [model, setModel] = useState<Transaction[]>()
     const [searchTerm, setSearchTerm] = useState("")
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 8
 
     useEffect(() => {
         setInitialModel()
@@ -92,11 +95,66 @@ export function TransactionsList() {
         return date.toLocaleDateString("th-TH", { day: "numeric", month: "short" })
     }
 
-    const filteredTransactions = model?.filter(
-        (transaction) =>
+    // Apply model filtering first by search term, then by filter criteria
+    const applyFiltering = (transaction: Transaction) => {
+        // First apply search term filter
+        const matchesSearch = 
             transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            transaction.category.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
+            transaction.category.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        if (!matchesSearch) return false;
+        
+        // Then apply context filters
+        if (filteredTransactions.type !== 'all') {
+            const isIncomeFilter = filteredTransactions.type === 'income';
+            if (transaction.isIncome !== isIncomeFilter) return false;
+        }
+        
+        if (filteredTransactions.category !== 'all' && transaction.category !== filteredTransactions.category) {
+            return false;
+        }
+        
+        if (filteredTransactions.date) {
+            const filterDate = new Date(filteredTransactions.date);
+            const transactionDate = new Date(transaction.date);
+            
+            if (
+                filterDate.getFullYear() !== transactionDate.getFullYear() ||
+                filterDate.getMonth() !== transactionDate.getMonth() ||
+                filterDate.getDate() !== transactionDate.getDate()
+            ) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    const transactionsFiltered = model?.filter(applyFiltering);
+
+    // Reset to first page when search term or filters change
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [searchTerm, filteredTransactions])
+
+    // Calculate pagination
+    const totalItems = transactionsFiltered?.length || 0
+    const totalPages = Math.ceil(totalItems / itemsPerPage)
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const paginatedTransactions = transactionsFiltered?.slice(startIndex, startIndex + itemsPerPage)
+
+    // Page navigation handlers
+    const goToNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1)
+        }
+    }
+
+    const goToPreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1)
+        }
+    }
 
 
     if (isLoading) {
@@ -125,20 +183,24 @@ export function TransactionsList() {
 
     return (
         <div className="space-y-4">
-            <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
-                <Input
-                    placeholder="ค้นหารายการ..."
-                    className="pl-9"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
+            <div className="flex gap-2">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
+                    <Input
+                        placeholder="ค้นหารายการ..."
+                        className="pl-9"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                
+              
             </div>
 
             <Card className="overflow-hidden !p-0">
                 <div className="divide-y">
-                    {filteredTransactions && filteredTransactions.length > 0 ? (
-                        filteredTransactions.map((transaction, index) => (
+                    {paginatedTransactions && paginatedTransactions.length > 0 ? (
+                        paginatedTransactions.map((transaction, index) => (
                             <div key={index} className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-800">
                                 <div
                                     className={`flex items-center justify-center h-10 w-10 rounded-full mr-3 ${getCategoryColor(transaction.category)}`}
@@ -156,11 +218,16 @@ export function TransactionsList() {
                                 <div className="flex items-center">
                                     <span className={`font-medium ${transaction.isIncome ? "text-green-600" : "text-red-600"}`}>
                                         {transaction.isIncome ? "+" : "-"}
-                                        {transaction.amount ? Number(transaction.amount).toLocaleString('th-TH', {
-                                            style: 'currency',
-                                            currency: 'THB',
-                                            minimumFractionDigits: 0,
-                                        }) : "0"}
+                                        {showMoney 
+                                            ? transaction.amount 
+                                                ? Number(transaction.amount).toLocaleString('th-TH', {
+                                                    style: 'currency',
+                                                    currency: 'THB',
+                                                    minimumFractionDigits: 0,
+                                                  }) 
+                                                : "0"
+                                            : "••••••"
+                                        }
                                     </span>
 
                                     <DropdownMenu>
@@ -184,6 +251,32 @@ export function TransactionsList() {
                         <div className="p-6 text-center text-muted-foreground">ไม่พบรายการที่ค้นหา</div>
                     )}
                 </div>
+                
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-between border-t p-4">
+                        <div className="text-sm text-muted-foreground">
+                            หน้า {currentPage} จาก {totalPages} ({totalItems} รายการ)
+                        </div>
+                        <div className="flex space-x-2">
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={goToPreviousPage} 
+                                disabled={currentPage === 1}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={goToNextPage} 
+                                disabled={currentPage === totalPages}
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </Card>
         </div>
     )

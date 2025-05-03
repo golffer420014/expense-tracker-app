@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
@@ -9,6 +8,7 @@ import { ThemeProvider } from "@/lib/context/theme-provider";
 import { CategoriesProvider } from "@/lib/context/categories-context";
 import { ModeToggle } from "@/components/mode-toggle";
 import Link from "next/link";
+import { MoneyVisibilityToggle } from "@/components/money-visibility-toggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,16 +43,19 @@ export default function RootLayout({
                 defaultTheme="system"
                 enableSystem
                 disableTransitionOnChange
-            >
-              <header className="sticky top-0 z-10 bg-background border-b">
-                <div className="container max-w-md mx-auto p-4 flex items-center justify-between">
-                  <Link href="/dashboard">
-                    <h1 className="text-xl font-bold cursor-pointer">Expense Tracker</h1>
-                  </Link>
-                  <ModeToggle />
-                </div>
-              </header>
-              {children}
+              >
+                <header className="sticky top-0 z-10 bg-background border-b">
+                  <div className="container max-w-md mx-auto p-4 flex items-center justify-between">
+                    <Link href="/dashboard">
+                      <h1 className="text-xl font-bold cursor-pointer">Expense Tracker</h1>
+                    </Link>
+                    <div className="flex items-center gap-2">
+                      <MoneyVisibilityToggle />
+                      <ModeToggle />
+                    </div>
+                  </div>
+                </header>
+                {children}
               </ThemeProvider>
             </CategoriesProvider>
           </TransactionsProvider>

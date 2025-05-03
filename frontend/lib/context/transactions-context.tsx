@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useAuth } from './auth-context';
@@ -33,6 +33,8 @@ interface Summary {
 interface TransactionsContextType {
   transactions: Transaction[];
   summary: Summary;
+  filteredTransactions: Filter;
+  setFilteredTransactions: (filteredTransactions: Filter) => void;
   isLoading: boolean;
   //   createTransaction: (data: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<void>;
   createTransaction: (data: Transaction) => Promise<void>;
@@ -40,11 +42,23 @@ interface TransactionsContextType {
   deleteTransaction: (id: number) => Promise<void>;
   getTransactions: (search?: string) => Promise<void>;
   getUserMonthlySummary: (month: number, year: number) => Promise<void>;
+  showMoney: boolean;
+  toggleShowMoney: () => void;
+}
+
+interface Filter {
+  date?: Date;
+  category?: string;
+  type?: string;
 }
 
 const TransactionsContext = createContext<TransactionsContextType | undefined>(undefined);
 
 export function TransactionsProvider({ children }: { children: React.ReactNode }) {
+  const { getToken } = useAuth();
+
+  // 
+
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<Summary>({
     user_id: '',
@@ -58,8 +72,26 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
     days_left: 0,
     avg_daily_budget_left: 0
   });
+  const [filteredTransactions, setFilteredTransactions] = useState<Filter>({
+    date: undefined,
+    category: 'all',
+    type: 'all'
+  });
   const [isLoading, setIsLoading] = useState(true);
-  const { getToken } = useAuth();
+  const [showMoney, setShowMoney] = useState(true);
+
+  useEffect(() => {
+    const savedShowMoney = localStorage.getItem('showMoney');
+    if (savedShowMoney !== null) {
+      setShowMoney(savedShowMoney === 'true');
+    }
+  }, []);
+
+  const toggleShowMoney = () => {
+    const newValue = !showMoney;
+    setShowMoney(newValue);
+    localStorage.setItem('showMoney', newValue.toString());
+  };
 
   const getTransactions = async (search?: string) => {
     try {
@@ -142,8 +174,6 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
     }
   };
 
-
-
   // _____________
 
   const getUserMonthlySummary = async (month: number, year: number) => {
@@ -166,16 +196,19 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
     }
   }
 
-
   const value = {
     transactions,
     summary,
+    filteredTransactions,
+    setFilteredTransactions,
     isLoading,
     createTransaction,
     updateTransaction,
     deleteTransaction,
     getTransactions,
     getUserMonthlySummary,
+    showMoney,
+    toggleShowMoney,
   };
 
   return (

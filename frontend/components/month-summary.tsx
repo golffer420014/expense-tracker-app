@@ -6,9 +6,10 @@ import { ArrowDownIcon, ArrowUpIcon } from "lucide-react"
 import { Skeleton } from "./ui/skeleton";
 
 export function MonthSummary() {
-  const { isLoading, summary } = useTransactions();
+  const { isLoading, summary, showMoney } = useTransactions();
 
   const formatNumber = (value: number) => {
+    if (!showMoney) return '••••••';
     if (!value) return '0';
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [integer, decimal] = value.toString().split('.');
@@ -23,36 +24,28 @@ export function MonthSummary() {
     return (
       <Card className="overflow-hidden !p-0">
         <CardContent className="!p-0">
-          <div className="grid grid-cols-4 divide-x">
+          <div className="grid grid-cols-3 divide-x divide-y">
+            {/* Skeleton loaders */}
             <div className="p-4 flex flex-col items-center">
               <span className="text-sm text-muted-foreground mb-1">รายรับ</span>
-              <div className="flex items-center">
-                <Skeleton className="h-[24px] w-16" />
-              </div>
+              <Skeleton className="h-5 w-20" />
             </div>
-
             <div className="p-4 flex flex-col items-center">
               <span className="text-sm text-muted-foreground mb-1">รายจ่าย</span>
-              <div className="flex items-center">
-                <Skeleton className="h-[24px] w-16" />
-              </div>
+              <Skeleton className="h-5 w-20" />
             </div>
-
             <div className="p-4 flex flex-col items-center">
               <span className="text-sm text-muted-foreground mb-1">คงเหลือ</span>
-              <Skeleton className="h-[24px] w-16" />
+              <Skeleton className="h-5 w-20" />
             </div>
-
-            <div className="p-4 flex flex-col items-center">
+            <div className="col-span-3 p-4 flex flex-col items-center">
               <span className="text-sm text-muted-foreground mb-1">งบประมาณ</span>
-              <div className="flex items-center">
-                <Skeleton className="h-[24px] w-16" />
-              </div>
+              <Skeleton className="h-5 w-24" />
             </div>
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (

@@ -24,6 +24,18 @@ const COLORS = [
     "#f43f5e", // rose
 ]
 
+const CustomTooltip = ({ active, payload }: { active: boolean, payload: { value: number, name: string }[] }) => {
+    const { showMoney } = useTransactions();
+    
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-background text-foreground p-2 rounded-md shadow-md">
+                <p className="label">{`จำนวนเงิน : ${showMoney ? formatAmount(payload[0].value) : '••••••'} บาท`}</p>
+            </div>
+        );
+    }
+}
+
 const formatAmount = (amount: number) => {
     return amount.toLocaleString('th-TH', {
         minimumFractionDigits: 2,
@@ -31,18 +43,8 @@ const formatAmount = (amount: number) => {
     });
 }
 
-const CustomTooltip = ({ active, payload }: { active: boolean, payload: { value: number, name: string }[] }) => {
-    if (active && payload && payload.length) {
-        return (
-            <div className="bg-background text-foreground p-2 rounded-md shadow-md">
-                <p className="label">{`จำนวนเงิน : ${formatAmount(payload[0].value)} บาท`}</p>
-            </div>
-        );
-    }
-}
-
 export function CategoryBreakdown() {
-    const { transactions, isLoading } = useTransactions()
+    const { transactions, isLoading, showMoney } = useTransactions()
     const [data, setData] = useState<CategoryData[]>([
         { name: "อาหาร", value: 8500, color: "#f59e0b" },
     ])
@@ -171,7 +173,7 @@ export function CategoryBreakdown() {
                             </div>
                             <div className="flex items-center space-x-3">
                                 <span className="font-medium">
-                                    {formatAmount(category.value)}
+                                    {showMoney ? formatAmount(category.value) : '••••••'}
                                 </span>
                                 <span className="text-sm text-muted-foreground min-w-[50px] text-right">
                                     {((category.value / total) * 100).toFixed(1)}%
