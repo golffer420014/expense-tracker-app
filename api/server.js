@@ -18,6 +18,7 @@ const user = require('./route/user');
 const categories = require('./route/categories');
 const transactions = require('./route/transactions');
 const auth = require('./route/auth');
+const budgets = require('./route/budgets');
 
 app.get('/', (req, res) => {
   res.send('Hello World');
@@ -27,6 +28,7 @@ app.use('/user', user);
 app.use('/categories', categories);
 app.use('/transactions', transactions);
 app.use('/auth', auth);
+app.use('/budgets', budgets);
 
 // Start server
 app.listen(port, () => {

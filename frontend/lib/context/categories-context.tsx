@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { showToast } from '@/lib/toast';
 import axios from 'axios';
 import { useAuth } from './auth-context';
+import _ from 'lodash';
 
 interface categories {
   id: number;
@@ -29,18 +30,35 @@ export function CategoriesProvider({ children }: { children: React.ReactNode }) 
 
   const getCategories = async () => {
     try {
-      if (!getToken()) {
-        return;
-      }
+      if (!getToken()) return;
+  
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/categories/get-all`);
-      setCategories(response.data);
+      const sorted = sortCategories(response.data);
+      setCategories(sorted);
     } catch (error) {
       showToast.error('ไม่สามารถดึงข้อมูลหมวดหมู่ได้');
       console.error('Error fetching categories:', error);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
+  
+
+  // option
+
+  const sortCategories = (categories: categories[]) => {
+    const sorted = _.chain(categories)
+      .groupBy('type') // แยก income / expense
+      .map((items: categories[]) => {
+        const others = items.filter(i => i.name === 'อื่นๆ');
+        const normal = _.orderBy(items.filter(i => i.name !== 'อื่นๆ'), ['name'], ['asc']);
+        return [...normal, ...others];
+      })
+      .flatten()
+      .value();
+  
+    return sorted;
+  };
 
   useEffect(() => {
     getCategories();
