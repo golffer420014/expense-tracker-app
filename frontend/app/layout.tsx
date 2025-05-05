@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
-import { AuthProvider } from "@/lib/context/auth-context";
-import { TransactionsProvider } from "@/lib/context/transactions-context";
-import { ThemeProvider } from "@/lib/context/theme-provider";
-import { CategoriesProvider } from "@/lib/context/categories-context";
+import { AppProvider } from "@/lib/context/app-provider";
 import { ModeToggle } from "@/components/mode-toggle";
 import Link from "next/link";
 import { MoneyVisibilityToggle } from "@/components/money-visibility-toggle";
@@ -35,35 +32,24 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <TransactionsProvider>
-            <CategoriesProvider>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-              >
-                <header className="sticky top-0 z-10 bg-background border-b">
-                  <div className="container max-w-md mx-auto p-4 flex items-center justify-between">
-                    <Link href="/dashboard">
-                      <h1 className="text-xl font-bold cursor-pointer 
-                      bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text  text-transparent
-                      ">
-                        Expense Tracker
-                      </h1>
-                    </Link>
-                    <div className="flex items-center gap-2">
-                      <MoneyVisibilityToggle />
-                      <ModeToggle />
-                    </div>
-                  </div>
-                </header>
-                {children}
-              </ThemeProvider>
-            </CategoriesProvider>
-          </TransactionsProvider>
-        </AuthProvider>
+        <AppProvider>
+          <header className="sticky top-0 z-10 bg-background border-b">
+            <div className="container max-w-md mx-auto p-4 flex items-center justify-between">
+              <Link href="/dashboard">
+                <h1 className="text-xl font-bold cursor-pointer 
+                bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text  text-transparent
+                ">
+                  Expense Tracker
+                </h1>
+              </Link>
+              <div className="flex items-center gap-2">
+                <MoneyVisibilityToggle />
+                <ModeToggle />
+              </div>
+            </div>
+          </header>
+          {children}
+        </AppProvider>
         <Toaster richColors position="top-right" />
       </body>
     </html>

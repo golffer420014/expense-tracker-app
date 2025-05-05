@@ -54,6 +54,7 @@ const getAll = async (req, res) => {
         const user_id = req.user?.id;
         const { search } = req.query;
 
+
         let searchObject = {};
         if (search) {
             try {
