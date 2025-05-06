@@ -38,8 +38,8 @@ interface TransactionsContextType {
   isLoading: boolean;
   setFilteredTransactions: (filteredTransactions: Filter) => void;
   //   createTransaction: (data: Omit<Transaction, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<void>;
-  createTransaction: (data: Transaction) => Promise<void>;
-  updateTransaction: (id: number, data: Partial<Transaction>) => Promise<void>;
+  createTransaction: (data: Transaction) => Promise<number>;
+  updateTransaction: (id: number, data: Partial<Transaction>) => Promise<number>;
   deleteTransaction: (id: number) => Promise<void>;
   getTransactions: (search?: string) => Promise<void>;
   getUserMonthlySummary: (month: number, year: number) => Promise<void>;
@@ -126,9 +126,7 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
           },
         }
       );
-      setTransactions((prev) => [...prev, response.data]);
-      toast.success('บันทึกรายการสำเร็จ');
-      getTransactions();
+      return response.status;
     } catch (error) {
       console.error('Error creating transaction:', error);
       toast.error('ไม่สามารถบันทึกรายการได้');
@@ -147,10 +145,7 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
           },
         }
       );
-      setTransactions((prev) =>
-        prev.map((transaction) => (transaction.id === id ? response.data : transaction))
-      );
-      toast.success('อัปเดตรายการสำเร็จ');
+      return response.status;
     } catch (error) {
       console.error('Error updating transaction:', error);
       toast.error('ไม่สามารถอัปเดตรายการได้');

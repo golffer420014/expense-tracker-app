@@ -100,9 +100,6 @@ export function RecentTransactions() {
                         <p className="text-sm text-muted-foreground mt-1 mb-4">
                             เริ่มต้นบันทึกรายการแรกของคุณ
                         </p>
-                        <Button variant="outline" className="gap-2">
-                            เพิ่มรายการใหม่
-                        </Button>
                     </div>
                 </CardContent>
             </Card>
@@ -110,28 +107,19 @@ export function RecentTransactions() {
     }
 
     return (
-        <Card className=" !pb-0">
-            <CardHeader>
+        <Card className=" !pb-0 !gap-0">
+            <CardHeader className="mb-4">
                 <CardTitle>รายการล่าสุด</CardTitle>
             </CardHeader>
-            <CardContent className="!p-0">
-                <div className="">
+            <CardContent className="!p-0 ">
+                <div className="divide-y divide-border">
                     {transactions
-                        // .filter(transaction => {
-                        //     // Filter transactions for current month
-                        //     const currentDate = new Date();
-                        //     const transactionDate = new Date(transaction.date);
-                        //     return (
-                        //         transactionDate.getMonth() === currentDate.getMonth() &&
-                        //         transactionDate.getFullYear() === currentDate.getFullYear()
-                        //     );
-                        // })
                         .slice(0, 5)
                         .map((transaction) => {
                         return (
                             <div
                                 key={transaction.id || 0}
-                                className="flex items-center space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                                className="flex items-center space-x-4 p-3  hover:bg-muted/50 transition-colors group"
                             >
                                 <Avatar className={cn(
                                     "h-10 w-10 transition-transform group-hover:scale-110",

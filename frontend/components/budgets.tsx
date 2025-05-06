@@ -8,7 +8,7 @@ import { useBudgets } from "@/lib/context/budgets-context"
 import { useTransactions } from "@/lib/context/transactions-context"
 import { formatAmount } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { PlusIcon } from "lucide-react"
+import { PlusIcon, ShoppingBag } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import iBudget from '@/interface/i-budget'
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
+import { Skeleton } from "./ui/skeleton"
 
 // ข้อมูลสำหรับ dropdown เดือน
 const months = [
@@ -58,31 +59,31 @@ interface Category {
 export function Budgets() {
     // ===== CONTEXT & STATE =====
     // Context hooks
-    const { 
-        budgets, 
-        isLoading, 
-        setBudgets, 
-        getBudgets, 
-        updateBudget: apiUpdateBudget, 
-        deleteBudget: apiDeleteBudget, 
-        createBudget: apiCreateBudget 
+    const {
+        budgets,
+        isLoading,
+        setBudgets,
+        getBudgets,
+        updateBudget: apiUpdateBudget,
+        deleteBudget: apiDeleteBudget,
+        createBudget: apiCreateBudget
     } = useBudgets();
     const { categories } = useCategories();
     const { showMoney } = useTransactions();
-    
+
     // การเลือกเดือนและปี
     const [year, setYear] = useState(currentYear.toString());
     const [month, setMonth] = useState((new Date().getMonth() + 1).toString().padStart(2, '0'));
-    
+
     // สถานะการ swipe
     const [swipedItemId, setSwipedItemId] = useState<string | null>(null);
     const budgetsRef = useRef<HTMLDivElement>(null);
-    
+
     // สถานะสำหรับ dialog เพิ่มงบประมาณ
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [expenseCategories, setExpenseCategories] = useState<Category[]>([]);
-    
+
     // สถานะสำหรับ dialog ยืนยันการลบ
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [itemToDeleteId, setItemToDeleteId] = useState<string | null>(null);
@@ -152,7 +153,7 @@ export function Budgets() {
 
             await apiCreateBudget(newBudget);
             getBudgets(`year=${year}&month=${month}`);
-            
+
             // ปิด dialog และรีเซ็ตฟอร์ม
             setIsAddDialogOpen(false);
             form.reset();
@@ -162,7 +163,7 @@ export function Budgets() {
             setIsSubmitting(false);
         }
     };
-    
+
     // ===== BUDGET ITEM OPERATIONS =====
     // เปิด/ปิดโหมดแก้ไข
     const toggleEdit = (id: string) => {
@@ -202,6 +203,7 @@ export function Budgets() {
 
     // จัดการ swipe
     const handleSwipe = (id: string) => {
+        setBudgets(budgets.map((item) => (item.id === id ? { ...item, isEditing: false } : item)));
         // ตรวจสอบว่าถ้า ID ที่ได้รับเป็น string ว่าง (จากการ swipe ซ้าย) ให้ตั้งค่าเป็น null
         if (id === "") {
             setSwipedItemId(null);
@@ -264,11 +266,34 @@ export function Budgets() {
             <Card className="!py-0 rounded-md">
                 <CardContent className="p-0">
                     {isLoading ? (
-                        <div className="p-4 text-center">กำลังโหลดข้อมูล...</div>
+                        <Card>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    {[...Array(5)].map((_, i) => (
+                                        <div key={i} className="flex items-center space-x-4">
+                                            <Skeleton className="h-10 w-10 rounded-full" />
+                                            <div className="space-y-2 flex-1">
+                                                <Skeleton className="h-4 w-[200px]" />
+                                                <Skeleton className="h-3 w-[150px]" />
+                                            </div>
+                                            <Skeleton className="h-4 w-[100px]" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
                     ) : (
                         <div className="divide-y">
                             {budgets.length === 0 ? (
-                                <div className="p-4 text-center">ไม่พบข้อมูลงบประมาณ</div>
+                                <div className="flex flex-col items-center justify-center py-12 text-center">
+                                <div className="rounded-full bg-muted p-4 mb-4">
+                                    <ShoppingBag className="h-8 w-8 text-muted-foreground" />
+                                </div>
+                                <h3 className="text-lg font-medium">ไม่มีข้อมูล</h3>
+                                <p className="text-sm text-muted-foreground mt-1 mb-4">
+                                     ไม่พบข้อมูลงบประมาณ
+                                </p>
+                            </div>
                             ) : (
                                 budgets.map((item) => (
                                     <div id={`budget-item-${item.id}`} key={item.id}>
@@ -299,7 +324,7 @@ export function Budgets() {
                     )}
                 </CardContent>
             </Card>
-            
+
             {/* กล่องยืนยันการลบ */}
             <ConfirmDeleteDialog
                 isOpen={isDeleteDialogOpen}
@@ -331,9 +356,9 @@ export function Budgets() {
                                         <Select
                                             onValueChange={field.onChange}
                                             defaultValue={field.value}
-                                            >
+                                        >
                                             <FormControl
-                                            className="w-full"
+                                                className="w-full"
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="เลือกหมวดหมู่" />

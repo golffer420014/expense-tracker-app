@@ -49,7 +49,7 @@ type TransactionFormProps = {
 
 export function TransactionForm({ onSuccess, initialData, isEditId }: TransactionFormProps) {
   const { categories } = useCategories();
-  const { createTransaction, updateTransaction } = useTransactions();
+  const { createTransaction, updateTransaction, getTransactions, getUserMonthlySummary } = useTransactions();
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [expenseCategories, setExpenseCategories] = useState<categories[]>([])
@@ -89,7 +89,7 @@ export function TransactionForm({ onSuccess, initialData, isEditId }: Transactio
     try {
       if (isEditId) {
         // ถ้าเป็นการแก้ไข
-        await updateTransaction(isEditId, {
+        const newTransaction = await updateTransaction(isEditId, {
           type: values.type,
           amount: parseFloat(values.amount),
           category_id: parseInt(values.category),
@@ -98,10 +98,16 @@ export function TransactionForm({ onSuccess, initialData, isEditId }: Transactio
           date: values.date,
           is_recurring: false,
         })
-        toast.success("อัปเดตรายการสำเร็จ")
+        if (newTransaction === 200) {
+          toast.success('อัปเดตรายการสำเร็จ');
+          getTransactions();
+          getUserMonthlySummary(new Date().getMonth() + 1, new Date().getFullYear());
+          await new Promise((resolve) => setTimeout(resolve, 500))
+          onSuccess()
+        }
       } else {
         // ถ้าเป็นการสร้างใหม่
-        await createTransaction({
+        const newTransaction = await createTransaction({
           type: values.type,
           amount: parseFloat(values.amount),
           category_id: parseInt(values.category),
@@ -110,12 +116,15 @@ export function TransactionForm({ onSuccess, initialData, isEditId }: Transactio
           date: values.date,
           is_recurring: false,
         })
-        toast.success("บันทึกรายการสำเร็จ")
+        if (newTransaction === 200) {
+          toast.success('บันทึกรายการสำเร็จ');
+          getTransactions();
+          getUserMonthlySummary(new Date().getMonth() + 1, new Date().getFullYear());
+          await new Promise((resolve) => setTimeout(resolve, 500))
+          onSuccess()
+        }
       }
-      
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      onSuccess()
+
     } catch (error) {
       console.error("Error saving transaction:", error)
       toast.error("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง")

@@ -42,7 +42,7 @@ const create = async (req, res) => {
             date: localDate
         });
 
-        res.status(201).json({ message: 'Transaction created', transaction: newTransaction });
+        res.status(200).json({ message: 'Transaction created', transaction: newTransaction });
     } catch (error) {
         console.error('Error creating transaction:', error);
         res.status(500).json({ message: 'Internal server error' });

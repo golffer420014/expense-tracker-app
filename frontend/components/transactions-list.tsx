@@ -60,12 +60,12 @@ type Transaction = {
 
 // Define properly typed formData interface
 interface TransactionFormData {
-  type: "expense" | "income";
-  amount: string;
-  category: string;
-  description?: string;
-  note?: string;
-  date: Date;
+    type: "expense" | "income";
+    amount: string;
+    category: string;
+    description?: string;
+    note?: string;
+    date: Date;
 }
 
 export function TransactionsList() {
@@ -77,7 +77,7 @@ export function TransactionsList() {
     const [editingTransactionId, setEditingTransactionId] = useState<number | undefined>(undefined)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [formData, setFormData] = useState<TransactionFormData | undefined>(undefined)
-    
+
     // Add state for delete confirmation
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
     const [deletingTransactionId, setDeletingTransactionId] = useState<number | undefined>(undefined)
@@ -130,7 +130,7 @@ export function TransactionsList() {
         setDeletingTransactionId(id)
         setIsDeleteDialogOpen(true)
     }
-    
+
     // Create function to handle actual deletion after confirmation
     const confirmDelete = async () => {
         if (deletingTransactionId) {
@@ -144,7 +144,7 @@ export function TransactionsList() {
             }
         }
     }
-    
+
     // Function to close delete dialog
     const closeDeleteDialog = () => {
         setIsDeleteDialogOpen(false)
@@ -167,26 +167,26 @@ export function TransactionsList() {
     // Apply model filtering first by search term, then by filter criteria
     const applyFiltering = (transaction: Transaction) => {
         // First apply search term filter
-        const matchesSearch = 
+        const matchesSearch =
             transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
             transaction.category.toLowerCase().includes(searchTerm.toLowerCase());
-        
+
         if (!matchesSearch) return false;
-        
+
         // Then apply context filters
         if (filteredTransactions.type !== 'all') {
             const isIncomeFilter = filteredTransactions.type === 'income';
             if (transaction.isIncome !== isIncomeFilter) return false;
         }
-        
+
         if (filteredTransactions.category !== 'all' && transaction.category !== filteredTransactions.category) {
             return false;
         }
-        
+
         if (filteredTransactions.date) {
             const filterDate = new Date(filteredTransactions.date);
             const transactionDate = new Date(transaction.date);
-            
+
             if (
                 filterDate.getFullYear() !== transactionDate.getFullYear() ||
                 filterDate.getMonth() !== transactionDate.getMonth() ||
@@ -195,7 +195,7 @@ export function TransactionsList() {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -262,15 +262,15 @@ export function TransactionsList() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                
-              
+
+
             </div>
 
             <Card className="overflow-hidden !p-0">
                 <div className="divide-y">
                     {paginatedTransactions && paginatedTransactions.length > 0 ? (
                         paginatedTransactions.map((transaction, index) => (
-                            <div key={index} className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <div key={index} className="flex items-center p-3 hover:bg-muted/50">
                                 <div
                                     className={`flex items-center justify-center h-10 w-10 rounded-full mr-3 ${getCategoryColor(transaction.category)}`}
                                 >
@@ -308,30 +308,40 @@ export function TransactionsList() {
                             </div>
                         ))
                     ) : (
-                        <div className="p-6 text-center text-muted-foreground">
-                            {searchTerm ? "ไม่พบรายการที่ค้นหา" : "ไม่มีรายการที่ต้องแสดง"}
-                        </div>
+                        <Card className="!pt-6">
+                            <CardContent className="!p-0 !py-0">
+                                <div className="flex flex-col items-center justify-center py-12 text-center">
+                                    <div className="rounded-full bg-muted p-4 mb-4">
+                                        <ShoppingBag className="h-8 w-8 text-muted-foreground" />
+                                    </div>
+                                    <h3 className="text-lg font-medium">ไม่มีรายการ</h3>
+                                    <p className="text-sm text-muted-foreground mt-1 mb-4">
+                                        {searchTerm ? "ไม่พบรายการที่คุณกำลังค้นหา" : "เริ่มต้นบันทึกรายการแรกของคุณ"}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
                     )}
                 </div>
-                
+
                 {totalPages > 1 && (
                     <div className="flex items-center justify-between border-t p-4">
                         <div className="text-sm text-muted-foreground">
                             หน้า {currentPage} จาก {totalPages} ({totalItems} รายการ)
                         </div>
                         <div className="flex space-x-2">
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={goToPreviousPage} 
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={goToPreviousPage}
                                 disabled={currentPage === 1}
                             >
                                 <ChevronLeft className="h-4 w-4" />
                             </Button>
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={goToNextPage} 
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={goToNextPage}
                                 disabled={currentPage === totalPages}
                             >
                                 <ChevronRight className="h-4 w-4" />
@@ -346,14 +356,14 @@ export function TransactionsList() {
                     <DialogHeader>
                         <DialogTitle>{editingTransactionId ? "แก้ไขรายการ" : "เพิ่มรายการใหม่"}</DialogTitle>
                     </DialogHeader>
-                    <TransactionForm 
+                    <TransactionForm
                         onSuccess={handleDialogClose}
                         initialData={formData}
                         isEditId={editingTransactionId}
                     />
                 </DialogContent>
             </Dialog>
-            
+
             {/* Add delete confirmation dialog */}
             <ConfirmDeleteDialog
                 isOpen={isDeleteDialogOpen}
