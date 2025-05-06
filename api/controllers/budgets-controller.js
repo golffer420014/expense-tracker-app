@@ -52,7 +52,7 @@ const create = async (req, res) => {
             amount
         });
 
-        res.status(201).json(newBudget);
+        res.status(200).json(newBudget);
     } catch (error) {
         console.error('Error creating budget:', error);
         res.status(500).json({ message: 'Internal server error' });

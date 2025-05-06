@@ -13,24 +13,6 @@ export default function SettingsPage() {
           <Budgets />
         </Suspense>
 
-        {/* <Tabs defaultValue="budget" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="budget">งบประมาณ</TabsTrigger>
-            <TabsTrigger value="categories">หมวดหมู่</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="budget">
-            <Suspense fallback={<Skeleton className="h-80 w-full" />}>
-              <BudgetSettings />
-            </Suspense>
-          </TabsContent>
-
-          <TabsContent value="categories">
-            <Suspense fallback={<Skeleton className="h-80 w-full" />}>
-              <CategorySettings />
-            </Suspense>
-          </TabsContent>
-        </Tabs> */}
       </main>
 
       <BottomNavbar />

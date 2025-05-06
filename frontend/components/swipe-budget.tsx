@@ -68,7 +68,7 @@ const SwipeBudget = ({
                     </div>
                 ) : (
                     <div className="flex items-center space-x-2">
-                        <span className={`transition-transform duration-400 ${isActive && '-translate-x-8'}`}>{formatAmount(item.amount, showMoney)}</span>
+                        <div className={`transition-transform duration-400 ${isActive && '-translate-x-8'}`}>{formatAmount(item.amount, showMoney)}</div>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(item.id)}>
                             <Pencil className="h-4 w-4 text-blue-500" />
                         </Button>
