@@ -41,7 +41,7 @@ export function TransactionFilters(
       ))} */}
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="sm" className="h-9">
+          <Button variant="outline" size="lg" className="h-9">
             <CalendarIcon className=" h-4 w-4" />
             {filteredTransactions.date ? format(filteredTransactions.date, "dd/MM/yyyy") : "วันที่"}
           </Button>
@@ -52,7 +52,7 @@ export function TransactionFilters(
       </Popover>
 
       <Select value={filteredTransactions.category} onValueChange={(value) => setFilteredTransactions({ ...filteredTransactions, category: value })}>
-        <SelectTrigger className="w-[110px] h-8">
+        <SelectTrigger className="w-[130px] h-8">
           <SelectValue placeholder="หมวดหมู่" />
         </SelectTrigger>
         <SelectContent>
@@ -66,7 +66,7 @@ export function TransactionFilters(
       </Select>
 
       <Select value={filteredTransactions.type} onValueChange={(value) => setFilteredTransactions({ ...filteredTransactions, type: value })}>
-        <SelectTrigger className="w-[110px] h-8">
+        <SelectTrigger className="w-[130px] h-8">
           <SelectValue placeholder="ประเภท" />
         </SelectTrigger>
         <SelectContent>

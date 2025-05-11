@@ -23,22 +23,22 @@ export function BottomNavbar() {
 
   const routes = [
     {
-      name: "แดชบอร์ด",
+      name: "Dashboard",
       path: "/dashboard",
       icon: <LayoutDashboard className="h-5 w-5" />,
     },
     {
-      name: "รายการ",
+      name: "Transactions",
       path: "/transactions",
       icon: <ListPlus className="h-5 w-5" />,
     },
     {
-      name: "รายงาน",
+      name: "Reports",
       path: "/reports",
       icon: <PieChart className="h-5 w-5" />,
     },
     {
-      name: "งบประมาณ",
+      name: "Budget",
       path: "/budget",
       icon: <DollarSign className="h-5 w-5" />,
     },
@@ -86,7 +86,7 @@ export function BottomNavbar() {
                         {route.icon}
                       </div>
                       <span className={cn(
-                        "text-xs font-medium transition-all duration-300",
+                        "!text-xs font-medium transition-all duration-300",
                         isActive ? "scale-110" : "scale-100"
                       )}>
                         {route.name}

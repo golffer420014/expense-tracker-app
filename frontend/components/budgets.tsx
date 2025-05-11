@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import SwipeBudget from "./swipe-budget"
 import { useBudgets } from "@/lib/context/budgets-context"
 import { useTransactions } from "@/lib/context/transactions-context"
-import { formatAmount } from "@/lib/utils"
+import { currentYear, formatAmount, months, years } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { PlusIcon, ShoppingBag } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
@@ -20,28 +20,9 @@ import iBudget from '@/interface/i-budget'
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
 import { Skeleton } from "./ui/skeleton"
 
-// ข้อมูลสำหรับ dropdown เดือน
-const months = [
-    { value: "01", label: "มกราคม" },
-    { value: "02", label: "กุมภาพันธ์" },
-    { value: "03", label: "มีนาคม" },
-    { value: "04", label: "เมษายน" },
-    { value: "05", label: "พฤษภาคม" },
-    { value: "06", label: "มิถุนายน" },
-    { value: "07", label: "กรกฎาคม" },
-    { value: "08", label: "สิงหาคม" },
-    { value: "09", label: "กันยายน" },
-    { value: "10", label: "ตุลาคม" },
-    { value: "11", label: "พฤศจิกายน" },
-    { value: "12", label: "ธันวาคม" },
-]
 
 // ข้อมูลสำหรับ dropdown ปี (ปีปัจจุบัน -1 ถึง ปีปัจจุบัน +2)
-const currentYear = new Date().getFullYear();
-const years = Array.from({ length: 4 }, (_, i) => {
-    const y = currentYear - 1 + i;
-    return { value: y.toString(), label: y.toString() };
-});
+
 
 // Schema สำหรับตรวจสอบความถูกต้องของฟอร์มเพิ่มงบประมาณ
 const formSchema = z.object({
@@ -286,14 +267,14 @@ export function Budgets() {
                         <div className="divide-y">
                             {budgets.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                                <div className="rounded-full bg-muted p-4 mb-4">
-                                    <ShoppingBag className="h-8 w-8 text-muted-foreground" />
+                                    <div className="rounded-full bg-muted p-4 mb-4">
+                                        <ShoppingBag className="h-8 w-8 text-muted-foreground" />
+                                    </div>
+                                    <h3 className="text-lg font-medium">ไม่มีข้อมูล</h3>
+                                    <p className="text-sm text-muted-foreground mt-1 mb-4">
+                                        ไม่พบข้อมูลงบประมาณ
+                                    </p>
                                 </div>
-                                <h3 className="text-lg font-medium">ไม่มีข้อมูล</h3>
-                                <p className="text-sm text-muted-foreground mt-1 mb-4">
-                                     ไม่พบข้อมูลงบประมาณ
-                                </p>
-                            </div>
                             ) : (
                                 budgets.map((item) => (
                                     <div id={`budget-item-${item.id}`} key={item.id}>

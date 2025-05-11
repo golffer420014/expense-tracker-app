@@ -19,16 +19,18 @@ const categories = require('./route/categories');
 const transactions = require('./route/transactions');
 const auth = require('./route/auth');
 const budgets = require('./route/budgets');
+const reports = require('./route/reports');
 
 app.get('/', (req, res) => {
   res.send('Hello World');
 });
 
+app.use('/auth', auth);
 app.use('/user', user);
 app.use('/categories', categories);
 app.use('/transactions', transactions);
-app.use('/auth', auth);
 app.use('/budgets', budgets);
+app.use('/reports', reports);
 
 // Start server
 app.listen(port, () => {

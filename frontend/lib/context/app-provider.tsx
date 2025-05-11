@@ -6,6 +6,7 @@ import { TransactionsProvider } from './transactions-context';
 import { CategoriesProvider } from './categories-context';
 import { ThemeProvider } from './theme-provider';
 import { BudgetsProvider } from './budgets-context';
+import { ReportsProvider } from './reports-context';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -17,15 +18,17 @@ export function AppProvider({ children }: AppProviderProps) {
       <TransactionsProvider>
         <CategoriesProvider>
           <BudgetsProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
+            <ReportsProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
             >
               {children}
             </ThemeProvider>
-          </BudgetsProvider>
+          </ReportsProvider>
+        </BudgetsProvider>
         </CategoriesProvider>
       </TransactionsProvider>
     </AuthProvider>

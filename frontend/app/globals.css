@@ -146,7 +146,7 @@
 }
 
 * {
-  @apply border-border;
+  @apply border-border text-lg;
 }
 
 body {
