@@ -26,6 +26,22 @@ export const showToast = {
     });
   },
 
+  info: (message: string, options?: ToastOptions) => {
+    toast.info(message, {
+      description: options?.description,
+      duration: options?.duration || 3000,
+      action: options?.action,
+    });
+  },
+
+  warn: (message: string, options?: ToastOptions) => {
+    toast.warning(message, {
+      description: options?.description,
+      duration: options?.duration || 4000,
+      action: options?.action,
+    });
+  },
+
   loading: (message: string, options?: ToastOptions) => {
     toast.loading(message, {
       description: options?.description,
@@ -51,4 +67,4 @@ export const showToast = {
   dismiss: () => {
     toast.dismiss();
   },
-}; 
+};

@@ -20,6 +20,7 @@ import iBudget from '@/interface/i-budget'
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { currentYear, months, years } from "@/lib/date-utils"
+import { showToast } from "@/lib/toast"
 
 
 // ข้อมูลสำหรับ dropdown ปี (ปีปัจจุบัน -1 ถึง ปีปัจจุบัน +2)
@@ -44,7 +45,6 @@ export function Budgets() {
     const {
         budgets,
         isLoading,
-        setBudgets,
         getBudgets,
         updateBudget: apiUpdateBudget,
         deleteBudget: apiDeleteBudget,
@@ -52,6 +52,8 @@ export function Budgets() {
     } = useBudgets();
     const { categories } = useCategories();
     const { showMoney } = useTransactions();
+
+    const [model, setModel] = useState<iBudget[]>([]);
 
     // การเลือกเดือนและปี
     const [year, setYear] = useState(currentYear.toString());
@@ -92,6 +94,10 @@ export function Budgets() {
             setExpenseCategories(categories.filter(category => category.type === "expense"));
         }
     }, [categories]);
+
+    useEffect(() => {
+        setModel(budgets);
+    }, [budgets]);
 
     // จัดการคลิกนอก swipe item เพื่อปิด
     useEffect(() => {
@@ -149,14 +155,22 @@ export function Budgets() {
     // ===== BUDGET ITEM OPERATIONS =====
     // เปิด/ปิดโหมดแก้ไข
     const toggleEdit = (id: string) => {
-        setBudgets(budgets.map((item) => (item.id === id ? { ...item, isEditing: !item.isEditing } : item)));
+        setModel(model.map((item) => (item.id === id ? { ...item, isEditing: !item.isEditing } : item)));
         setSwipedItemId(null);
     };
 
     // อัพเดตงบประมาณ
     const updateBudget = async (id: string, newBudget: number) => {
-        setBudgets(
-            budgets.map((item) => (item.id === id ? { ...item, amount: newBudget.toString(), isEditing: false } : item)),
+        const currentItem = model.find((item) => item.id === id);
+        if (currentItem?.amount == newBudget.toString()) {
+            toggleEdit(id);
+            showToast.warn('งบประมาณไม่มีการเปลี่ยนแปลง');
+            return;
+        }
+
+
+        setModel(
+            model.map((item) => (item.id === id ? { ...item, amount: newBudget.toString(), isEditing: false } : item)),
         );
 
         await apiUpdateBudget(id, newBudget.toString());
@@ -164,19 +178,21 @@ export function Budgets() {
 
     // กำลังแก้ไขงบประมาณ (input change)
     const handleChange = (id: string, newBudget: number) => {
-        setBudgets(
-            budgets.map((item) => (item.id === id ? { ...item, amount: newBudget.toString() } : item)),
+        setModel(
+            model.map((item) => (item.id === id ? { ...item, amount: newBudget.toString() } : item)),
         );
     };
 
     // ยกเลิกการแก้ไข
     const cancelEdit = (id: string) => {
-        setBudgets(budgets.map((item) => (item.id === id ? { ...item, isEditing: false } : item)));
+        setModel(
+            model.map((item) => (item.id === id ? { ...item, isEditing: false } : item)),
+        );
     };
 
     // ลบงบประมาณ
     const deleteBudget = async (id: string) => {
-        setBudgets(budgets.filter((item) => item.id !== id));
+        setModel(model.filter((item) => item.id !== id));
         setSwipedItemId(null);
 
         await apiDeleteBudget(id);
@@ -184,7 +200,7 @@ export function Budgets() {
 
     // จัดการ swipe
     const handleSwipe = (id: string) => {
-        setBudgets(budgets.map((item) => (item.id === id ? { ...item, isEditing: false } : item)));
+        setModel(model.map((item) => (item.id === id ? { ...item, isEditing: false } : item)));
         // ตรวจสอบว่าถ้า ID ที่ได้รับเป็น string ว่าง (จากการ swipe ซ้าย) ให้ตั้งค่าเป็น null
         if (id === "") {
             setSwipedItemId(null);
@@ -195,7 +211,7 @@ export function Budgets() {
     };
 
     // คำนวณยอดรวมงบประมาณ
-    const totalBudget = budgets.reduce((sum, item) => sum + Number(item.amount), 0);
+    const totalBudget = model.reduce((sum, item) => sum + Number(item.amount), 0);
 
     // ===== RENDER =====
     return (
@@ -265,7 +281,7 @@ export function Budgets() {
                         </Card>
                     ) : (
                         <div className="divide-y">
-                            {budgets.length === 0 ? (
+                            {model.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12 text-center">
                                     <div className="rounded-full bg-muted p-4 mb-4">
                                         <ShoppingBag className="h-8 w-8 text-muted-foreground" />
@@ -276,7 +292,7 @@ export function Budgets() {
                                     </p>
                                 </div>
                             ) : (
-                                budgets.map((item) => (
+                                model.map((item) => (
                                     <div id={`budget-item-${item.id}`} key={item.id}>
                                         <SwipeBudget
                                             item={item}
