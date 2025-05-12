@@ -27,13 +27,14 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
 
   const getBudgets = async (query: string) => {
     try {
+      setIsLoading(true);
       if (!getToken()) return;
-      const response = await 
-      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/budgets/get-all?${query}`,{
-        headers: {
-          Authorization: `Bearer ${getToken()}`
-        }
-      });
+      const response = await
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/budgets/get-all?${query}`, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`
+          }
+        });
       setBudgets(_.map(response.data, (item) => ({
         ...item,
         amount: Number(item.amount),
@@ -43,6 +44,7 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
       showToast.error('ไม่สามารถดึงข้อมูลงบประมาณได้');
       console.error('Error fetching budgets:', error);
     } finally {
+      await new Promise(resolve => setTimeout(resolve, 500));
       setIsLoading(false);
     }
   };
@@ -50,7 +52,7 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
   const createBudget = async (budget: iBudget) => {
     try {
       if (!getToken()) return;
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/budgets/create`, budget,{
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/budgets/create`, budget, {
         headers: {
           Authorization: `Bearer ${getToken()}`
         }
@@ -68,8 +70,8 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
   const updateBudget = async (id: string, amount: string) => {
     try {
       if (!getToken()) return;
-      
-      const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/budgets/update-budget/${id}`, 
+
+      const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/budgets/update-budget/${id}`,
         { amount },
         {
           headers: {
@@ -77,13 +79,13 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
           }
         }
       );
-      
+
       if (response.status === 200) {
         showToast.success('อัพเดทงบประมาณเรียบร้อย');
-        
+
         // อัพเดทข้อมูลในสเตท
         setBudgets(
-          budgets.map((budget) => 
+          budgets.map((budget) =>
             budget.id === id ? { ...budget, amount: amount, isEditing: false } : budget
           )
         );
@@ -97,16 +99,16 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
   const deleteBudget = async (id: string) => {
     try {
       if (!getToken()) return;
-      
+
       const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/budgets/remove-budget/${id}`, {
         headers: {
           Authorization: `Bearer ${getToken()}`
         }
       });
-      
+
       if (response.status === 200) {
         showToast.success('ลบงบประมาณเรียบร้อย');
-        
+
         // ลบข้อมูลออกจากสเตท
         setBudgets(budgets.filter((budget) => budget.id !== id));
       }

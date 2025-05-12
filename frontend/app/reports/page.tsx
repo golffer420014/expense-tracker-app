@@ -1,6 +1,6 @@
 // import React, { Suspense } from 'react'
 import { BottomNavbar } from '@/components/bottom-navbar'
-import BarHorizon from '@/components/year-summary'
+import YearSummary from '@/components/year-summary'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Suspense } from 'react'
@@ -18,7 +18,7 @@ const page = () => {
           </TabsList>
           <TabsContent value="monthly">
             <Suspense fallback={<Skeleton className="h-80 w-full" />}>
-              <BarHorizon />
+              <YearSummary />
             </Suspense>
           </TabsContent>
         </Tabs>

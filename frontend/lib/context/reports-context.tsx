@@ -37,7 +37,6 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
             setYearlySummary(data);
         } catch (error) {
             console.error('Error getting yearly summary:', error);
-            return [];
         } finally {
             await new Promise((resolve) => setTimeout(resolve, 500))
             setIsLoading(false);
