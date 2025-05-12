@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import axios from 'axios';
-import { useAuth } from './auth-context';
+import { useAuth } from '@/lib/context/auth-context';
 
 interface Transaction {
   id?: number;

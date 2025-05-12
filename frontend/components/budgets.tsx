@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import SwipeBudget from "./swipe-budget"
+import SwipeBudget from "@/components/swipe-budget"
 import { useBudgets } from "@/lib/context/budgets-context"
 import { useTransactions } from "@/lib/context/transactions-context"
-import { currentYear, formatAmount, months, years } from "@/lib/utils"
+import { formatAmount } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { PlusIcon, ShoppingBag } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
@@ -17,8 +17,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import iBudget from '@/interface/i-budget'
-import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
-import { Skeleton } from "./ui/skeleton"
+import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog"
+import { Skeleton } from "@/components/ui/skeleton"
+import { currentYear, months, years } from "@/lib/date-utils"
 
 
 // ข้อมูลสำหรับ dropdown ปี (ปีปัจจุบัน -1 ถึง ปีปัจจุบัน +2)
@@ -175,7 +176,6 @@ export function Budgets() {
 
     // ลบงบประมาณ
     const deleteBudget = async (id: string) => {
-        console.log(id);
         setBudgets(budgets.filter((item) => item.id !== id));
         setSwipedItemId(null);
 

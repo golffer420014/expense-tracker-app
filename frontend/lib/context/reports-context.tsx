@@ -2,10 +2,10 @@
 
 import { createContext, useContext, useState } from 'react';
 import axios from 'axios';
-import { useAuth } from './auth-context';
+import { useAuth } from '@/lib/context/auth-context';
 import iReportYearly from '@/interface/i-report-yearly';
-import { months } from '../utils';
 import _ from 'lodash';
+import { months } from '@/lib/date-utils';
 
 type ReportsContextType = {
     yearlySummary: iReportYearly[];
@@ -24,7 +24,6 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
         try {
             setIsLoading(true);
             if (!getToken()) return;
-            console.log('getToken', getToken());
             const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/reports/get-yearly-summary?year=${year}`, {
                 headers: {
                     Authorization: `Bearer ${getToken()}`

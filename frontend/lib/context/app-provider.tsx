@@ -1,12 +1,12 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { AuthProvider } from './auth-context';
-import { TransactionsProvider } from './transactions-context';
-import { CategoriesProvider } from './categories-context';
-import { ThemeProvider } from './theme-provider';
-import { BudgetsProvider } from './budgets-context';
-import { ReportsProvider } from './reports-context';
+import { AuthProvider } from '@/lib/context/auth-context';
+import { TransactionsProvider } from '@/lib/context/transactions-context';
+import { CategoriesProvider } from '@/lib/context/categories-context';
+import { ThemeProvider } from '@/lib/context/theme-provider';
+import { BudgetsProvider } from '@/lib/context/budgets-context';
+import { ReportsProvider } from '@/lib/context/reports-context';
 
 interface AppProviderProps {
   children: ReactNode;

@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { useTransactions } from "@/lib/context/transactions-context";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react"
-import { Skeleton } from "./ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatAmount } from "@/lib/utils";
 
 export function MonthSummary() {

@@ -40,7 +40,7 @@ export function MonthSelector() {
 
   if (isLoading) {
     return <div className="flex items-center justify-center mb-4">
-      <Loader2 className="w-28 h-[36px] animate-spin text-primary" />
+      <Loader2 className="w-28 h-[40px] animate-spin text-primary" />
     </div>
   }
 

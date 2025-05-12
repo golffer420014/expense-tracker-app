@@ -2,52 +2,19 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ShoppingBag, Coffee, Bus, Home, Briefcase, MoreVertical, Search, ChevronLeft, ChevronRight } from "lucide-react"
+import { ShoppingBag, MoreVertical, Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { useTransactions } from "@/lib/context/transactions-context"
-import { Skeleton } from "./ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
-import { TransactionForm } from "./transaction-form"
+import { TransactionForm } from "@/components/transaction-form"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
+import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog"
 import { formatAmount } from "@/lib/utils"
+import { getCategoryIcon, getCategoryColor } from "@/lib/category-utils"
 
-// Helper function to get icon by category
-const getCategoryIcon = (category: string) => {
-    switch (category) {
-        case "อาหาร":
-            return <Coffee className="h-4 w-4" />
-        case "เดินทาง":
-            return <Bus className="h-4 w-4" />
-        case "ช้อปปิ้ง":
-            return <ShoppingBag className="h-4 w-4" />
-        case "ที่พัก":
-            return <Home className="h-4 w-4" />
-        case "รายได้":
-            return <Briefcase className="h-4 w-4" />
-        default:
-            return <Coffee className="h-4 w-4" />
-    }
-}
 
-// Helper function to get color by category
-const getCategoryColor = (category: string) => {
-    switch (category) {
-        case "อาหาร":
-            return "bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-300"
-        case "เดินทาง":
-            return "bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300"
-        case "ช้อปปิ้ง":
-            return "bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-300"
-        case "ที่พัก":
-            return "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300"
-        case "รายได้":
-            return "bg-emerald-100 text-emerald-600 dark:bg-emerald-900 dark:text-emerald-300"
-        default:
-            return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-    }
-}
 
 type Transaction = {
     id: number

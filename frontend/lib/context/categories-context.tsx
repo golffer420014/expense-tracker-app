@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { showToast } from '@/lib/toast';
 import axios from 'axios';
-import { useAuth } from './auth-context';
+import { useAuth } from '@/lib/context/auth-context';
 import _ from 'lodash';
 
 interface categories {

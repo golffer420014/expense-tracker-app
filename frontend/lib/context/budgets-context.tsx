@@ -3,7 +3,7 @@
 import { createContext, useContext, useState } from 'react';
 import { showToast } from '@/lib/toast';
 import axios from 'axios';
-import { useAuth } from './auth-context';
+import { useAuth } from '@/lib/context/auth-context';
 import iBudget from '@/interface/i-budget';
 import _ from 'lodash';
 

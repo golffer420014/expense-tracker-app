@@ -31,7 +31,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      console.log('checkAuth');
       const token = localStorage.getItem('token');
       if (!token) {
         localStorage.removeItem('token');
