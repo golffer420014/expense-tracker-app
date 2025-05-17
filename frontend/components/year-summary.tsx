@@ -15,7 +15,7 @@ import { currentYear } from '@/lib/date-utils';
 
 
 
-const YearlySummary = () => {
+export function YearlySummary() {
   const [year, setYear] = useState(currentYear.toString())
   const { yearlySummary, getYearlySummary, isLoading } = useReports();
 
@@ -76,4 +76,4 @@ const YearlySummary = () => {
   );
 }
 
-export default YearlySummary;
+

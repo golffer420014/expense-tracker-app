@@ -135,7 +135,7 @@ export function CategoryBreakdown() {
                                 paddingAngle={2}
                                 dataKey="value"
                                 label={({ percent }: { percent: number }) =>
-                                    percent > 0.05 ? `${(percent * 100).toFixed(0)}%` : ''
+                                    percent > 0.05 ? `${(percent * 100).toFixed(2)}%` : ''
                                 }
                                 labelLine={false}
                             >
@@ -172,7 +172,7 @@ export function CategoryBreakdown() {
                                     {formatAmount(category.value, showMoney)}
                                 </span>
                                 <span className="text-sm text-muted-foreground min-w-[50px] text-right">
-                                    {((category.value / total) * 100).toFixed(1)}%
+                                    {((category.value / total) * 100).toFixed(2)}%
                                 </span>
                             </div>
                         </div>

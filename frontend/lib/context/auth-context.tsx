@@ -14,7 +14,7 @@ type User = {
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
-  register: (username: string, name: string, password: string) => Promise<void>;
+  register: (object: { username: string, name: string, password: string, confirmPassword: string, provider_type: string, provider_user_id: string, avatar_url: string }) => Promise<boolean>;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -61,17 +61,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, [pathname]);
 
-  const register = async (username: string, name: string, password: string) => {
+  const register = async (object: { username: string, name: string, password: string, confirmPassword: string, provider_type: string, provider_user_id: string, avatar_url: string }) => {
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/register`, { username, name, password });
-      if (response.status !== 200) {
-        throw new Error('Register failed');
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/register`, object);
+      console.log(response);
+      if (response.status == 200) {
+        showToast.success('สมัครสมาชิกสำเร็จ');
+        return true;
       }
-      showToast.success('สมัครสมาชิกสำเร็จ');
-      return response.data;
+      return false;
     } catch (error) {
       showToast.error('สมัครสมาชิกไม่สำเร็จ');
       console.error('Register failed:', error);
+      return false;
     }
   }
 

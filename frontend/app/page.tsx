@@ -13,13 +13,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Eye, EyeOff, Lock, User,IdCard } from "lucide-react"
+import { Eye, EyeOff, Lock, User, IdCard } from "lucide-react"
 import { showToast } from "@/lib/toast"
 import { useAuth } from "@/lib/context/auth-context";
+import { Separator } from "@/components/ui/spearator"
 
 export default function AuthTabs() {
   const { login, register } = useAuth();
   const [showPassword, setShowPassword] = useState(false)
+  const [activeTab, setActiveTab] = useState("login")
   const [formLogin, setFormLogin] = useState({
     username: "",
     password: "",
@@ -27,9 +29,13 @@ export default function AuthTabs() {
   const [formRegister, setFormRegister] = useState({
     username: "",
     password: "",
-    name: "",
     confirmPassword: "",
+    name: "",
+    provider_type: "local",
+    provider_user_id: "",
+    avatar_url: "",
   })
+
 
   const handleChangeLogin = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormLogin({ ...formLogin, [e.target.name]: e.target.value })
@@ -49,13 +55,27 @@ export default function AuthTabs() {
     login(formLogin.username, formLogin.password)
   }
 
-  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (formRegister.password !== formRegister.confirmPassword) {
       showToast.error("Password and confirm password do not match")
       return
     }
-    register(formRegister.username, formRegister.name, formRegister.password)
+    const result = await register(formRegister)
+    if (result) {
+      setFormRegister({
+        username: "",
+        password: "",
+        confirmPassword: "",
+        name: "",
+        provider_type: "local",
+        provider_user_id: "",
+        avatar_url: "",
+      })
+      setTimeout(() => {
+        setActiveTab("login")
+      }, 1000)
+    }
   }
 
   return (
@@ -67,7 +87,7 @@ export default function AuthTabs() {
           <CardDescription className="text-center">Sign in to your account or create a new one</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6 gap-2">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
@@ -100,7 +120,7 @@ export default function AuthTabs() {
                       </Button>
                     </div>
                   </div>
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full mt-4">
                     Login
                   </Button>
                 </div>
@@ -110,13 +130,6 @@ export default function AuthTabs() {
             <TabsContent value="register">
               <form onSubmit={handleRegister}>
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input id="username" name="username" placeholder="username" className="pl-10" required onChange={handleChangeRegister} />
-                    </div>
-                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
                     <div className="relative">
@@ -132,6 +145,14 @@ export default function AuthTabs() {
                       />
                     </div>
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input id="username" name="username" placeholder="username" className="pl-10" required onChange={handleChangeRegister} />
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="register-password">Password</Label>
                     <div className="relative">
@@ -175,7 +196,7 @@ export default function AuthTabs() {
                         className="absolute right-1 top-1 h-8 w-8"
                         onClick={togglePasswordVisibility}
                       >
-                        {showPassword ? <EyeOff  /> : <Eye  />}
+                        {showPassword ? <EyeOff /> : <Eye />}
                         <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
                       </Button>
                     </div>
@@ -189,17 +210,10 @@ export default function AuthTabs() {
           </Tabs>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">continue with thrid party coming soon..</span>
-            </div>
-          </div>
+          <Separator />
           <div className="grid grid-cols-2 gap-4">
-            {/* <Button variant="outline">Google</Button> */}
-            {/* <Button variant="outline">Facebook</Button> */}
+            <Button variant="outline">Google</Button>
+            <Button variant="outline">Facebook</Button>
           </div>
         </CardFooter>
       </Card>

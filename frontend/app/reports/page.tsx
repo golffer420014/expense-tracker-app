@@ -1,6 +1,7 @@
 // import React, { Suspense } from 'react'
 import { BottomNavbar } from '@/components/bottom-navbar'
-import YearSummary from '@/components/year-summary'
+import { YearlySummary } from '@/components/year-summary'
+import { ExpenseBudgetSummary } from '@/components/expenseBudgetSummary'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Suspense } from 'react'
@@ -18,7 +19,12 @@ const page = () => {
           </TabsList>
           <TabsContent value="monthly">
             <Suspense fallback={<Skeleton className="h-80 w-full" />}>
-              <YearSummary />
+              <YearlySummary />
+            </Suspense>
+          </TabsContent>
+          <TabsContent value="category">
+            <Suspense fallback={<Skeleton className="h-80 w-full" />}>
+              <ExpenseBudgetSummary />
             </Suspense>
           </TabsContent>
         </Tabs>

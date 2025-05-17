@@ -28,7 +28,7 @@ const create = async (req, res) => {
             type
         });
 
-        res.status(201).json({ message: 'Category created', category: newCategory });
+        res.status(200).json({ message: 'Category created', category: newCategory });
     } catch (error) {
         console.error('Error creating category:', error);
         res.status(500).json({ message: 'Internal server error' });

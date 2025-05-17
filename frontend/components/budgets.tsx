@@ -58,6 +58,7 @@ export function Budgets() {
     // การเลือกเดือนและปี
     const [year, setYear] = useState(currentYear.toString());
     const [month, setMonth] = useState((new Date().getMonth() + 1).toString().padStart(2, '0'));
+    const [budgetBeforeChange, setBudgetBeforeChange] = useState<string>("0");
 
     // สถานะการ swipe
     const [swipedItemId, setSwipedItemId] = useState<string | null>(null);
@@ -156,13 +157,13 @@ export function Budgets() {
     // เปิด/ปิดโหมดแก้ไข
     const toggleEdit = (id: string) => {
         setModel(model.map((item) => (item.id === id ? { ...item, isEditing: !item.isEditing } : item)));
+        setBudgetBeforeChange(model.find((item) => item.id === id)?.amount || "0");
         setSwipedItemId(null);
     };
 
     // อัพเดตงบประมาณ
     const updateBudget = async (id: string, newBudget: number) => {
-        const currentItem = model.find((item) => item.id === id);
-        if (currentItem?.amount == newBudget.toString()) {
+        if (budgetBeforeChange == newBudget.toString()) {
             toggleEdit(id);
             showToast.warn('งบประมาณไม่มีการเปลี่ยนแปลง');
             return;

@@ -37,7 +37,7 @@ const CustomTooltip = ({
 const BarHorizon = ({ yearlySummary }: { yearlySummary: iReportYearly[] }) => {
   return (
     <div>
-      <ResponsiveContainer width="100%" height={500}>
+      <ResponsiveContainer width="100%" height={600}>
         <BarChart
           data={yearlySummary}
           layout="vertical"
