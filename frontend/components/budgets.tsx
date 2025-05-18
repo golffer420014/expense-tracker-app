@@ -222,7 +222,7 @@ export function Budgets() {
                 <h2 className="text-lg font-semibold">ตั้งค่างบประมาณ</h2>
                 <div className="flex gap-2">
                     <Select value={year} onValueChange={setYear}>
-                        <SelectTrigger className="w-[120px]">
+                        <SelectTrigger className="w-[100px]">
                             <SelectValue placeholder="ปี" />
                         </SelectTrigger>
                         <SelectContent>
@@ -234,7 +234,7 @@ export function Budgets() {
                         </SelectContent>
                     </Select>
                     <Select value={month} onValueChange={setMonth}>
-                        <SelectTrigger className="w-[120px]">
+                        <SelectTrigger className="w-[150px]">
                             <SelectValue placeholder="เดือน" />
                         </SelectTrigger>
                         <SelectContent>

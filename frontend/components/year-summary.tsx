@@ -29,7 +29,7 @@ export function YearlySummary() {
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-md font-medium">สรุปรายเดือน</CardTitle>
         <Select value={year} onValueChange={setYear}>
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[100px]">
             <SelectValue placeholder="ปี" />
           </SelectTrigger>
           <SelectContent>

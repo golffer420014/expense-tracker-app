@@ -12,6 +12,7 @@ type ReportsContextType = {
     yearlySummary: iReportYearly[];
     expenseBudgetSummary: iReportExpenseBudget[];
     isLoading: boolean;
+    setIsLoading: (isLoading: boolean) => void;
     getYearlySummary: (year: string) => Promise<void>; // ?year=2025&month=05
     getExpenseBudgetSummary: (year: string, month: string) => Promise<void>; // ?year=2025&month=05
 };
@@ -69,6 +70,7 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
         yearlySummary,
         expenseBudgetSummary,
         isLoading,
+        setIsLoading,
         getYearlySummary,
         getExpenseBudgetSummary,
     };

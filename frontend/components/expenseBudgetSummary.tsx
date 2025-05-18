@@ -18,12 +18,13 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, BarChart3, PieChart as PieChartIcon, Wallet } from "lucide-react"
 import { currentYear, months, years } from "@/lib/date-utils"
 import { useReports } from "@/lib/context/reports-context"
 import { useTransactions } from "@/lib/context/transactions-context"
 import { formatAmount } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import type { TooltipProps } from 'recharts';
 
 type CategoryData = {
@@ -58,13 +59,59 @@ const CustomTooltip = (props: TooltipProps<string, number>) => {
   return null;
 }
 
+const NoDataState = ({ viewType }: { viewType: string }) => {
+  return (
+    <Card>
+      <CardContent>
+
+        <div className="flex flex-col items-center justify-center h-80 text-muted-foreground">
+          {viewType === "pie" && <PieChartIcon className="h-12 w-12 mb-4" />}
+          {viewType === "bar" && <BarChart3 className="h-12 w-12 mb-4" />}
+          {viewType === "budget" && <Wallet className="h-12 w-12 mb-4" />}
+          <p className="text-lg font-medium">ไม่มีข้อมูล</p>
+          <p className="text-sm">กรุณาเลือกเดือนและปีอื่น</p>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+const LoadingSkeleton = ({ viewType }: { viewType: string }) => {
+  if (viewType === "budget") {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-48" />
+        </div>
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-5 w-24" />
+              </div>
+              <Skeleton className="h-4 w-full" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="h-[23rem]">
+      <Skeleton className="h-full w-full" />
+    </div>
+  )
+}
 
 export function ExpenseBudgetSummary() {
   const [year, setYear] = useState(currentYear.toString());
   const [month, setMonth] = useState((new Date().getMonth() + 1).toString().padStart(2, '0'));
   const { showMoney } = useTransactions();
   const [viewType, setViewType] = useState("pie")
-  const { expenseBudgetSummary, getExpenseBudgetSummary } = useReports();
+  const { expenseBudgetSummary, isLoading, getExpenseBudgetSummary, setIsLoading } = useReports();
+
 
   useEffect(() => {
     getExpenseBudgetSummary(year, month);
@@ -93,13 +140,21 @@ export function ExpenseBudgetSummary() {
     return Math.min(100, Math.round((value / budget) * 100))
   }
 
+  const handleViewTypeChange = (value: string) => {
+    setIsLoading(true);
+    setViewType(value);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+  }
+
   return (
     <Card>
       <CardHeader className="flex flex-col items-center justify-between pb-2">
         <CardTitle className="text-md font-medium">สัดส่วนรายจ่ายตามหมวดหมู่</CardTitle>
         <div className="flex gap-2">
           <Select value={year} onValueChange={setYear}>
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-[100px]">
               <SelectValue placeholder="ปี" />
             </SelectTrigger>
             <SelectContent>
@@ -111,7 +166,7 @@ export function ExpenseBudgetSummary() {
             </SelectContent>
           </Select>
           <Select value={month} onValueChange={setMonth}>
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="เดือน" />
             </SelectTrigger>
             <SelectContent>
@@ -125,7 +180,7 @@ export function ExpenseBudgetSummary() {
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="pie" onValueChange={setViewType} className="w-full mb-4">
+        <Tabs defaultValue="pie" onValueChange={handleViewTypeChange} className="w-full mb-4">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="pie">แผนภูมิวงกลม</TabsTrigger>
             <TabsTrigger value="bar">แผนภูมิแท่ง</TabsTrigger>
@@ -133,133 +188,133 @@ export function ExpenseBudgetSummary() {
           </TabsList>
         </Tabs>
 
-        {viewType === "pie" && (
-          <div className="h-80">
-            {data.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-gray-400">ไม่มีข้อมูล</div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={data}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={2}
-                    dataKey="value"
-                    label={({ percent }: { percent: number }) =>
-                      percent > 0.05 ? `${(percent * 100).toFixed(2)}%` : ''
-                    }
-                    labelLine={false}
-                  >
-                    {data.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                        className="transition-opacity hover:opacity-80"
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip content={CustomTooltip} />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        )}
-
-        {viewType === "bar" && (
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={barData} layout="vertical" margin={{ top: 5, right: 30, left: 50, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                <XAxis type="number" />
-                <YAxis type="category" dataKey="name" width={80} />
-                <Tooltip content={CustomTooltip} />
-                <Legend />
-                <Bar dataKey="งบประมาณ" fill="#3b82f6" />
-                <Bar dataKey="จ่ายจริง" fill="#f43f5e" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-
-        {viewType === "budget" && (
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-
-                <span className="text-sm font-medium">งบประมาณรวม <Badge variant="outline">{formatAmount(totalBudget, showMoney)}</Badge></span>
+        {isLoading ? (
+          <LoadingSkeleton viewType={viewType} />
+        ) : data.length === 0 ? (
+          <NoDataState viewType={viewType} />
+        ) : (
+          <>
+            {viewType === "pie" && (
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={data}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={2}
+                      dataKey="value"
+                      label={({ percent }: { percent: number }) =>
+                        percent > 0.05 ? `${(percent * 100).toFixed(2)}%` : ''
+                      }
+                      labelLine={false}
+                    >
+                      {data.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                          className="transition-opacity hover:opacity-80"
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip content={CustomTooltip} />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
+            )}
 
-            </div>
+            {viewType === "bar" && (
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={barData} layout="vertical" margin={{ top: 5, right: 30, left: 50, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                    <XAxis type="number" />
+                    <YAxis type="category" dataKey="name" width={80} />
+                    <Tooltip content={CustomTooltip} />
+                    <Legend />
+                    <Bar dataKey="งบประมาณ" fill="#3b82f6" />
+                    <Bar dataKey="จ่ายจริง" fill="#f43f5e" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
 
-            <div className="space-y-4">
-              {data.map((category) => {
-                return (
-                  <div key={category.name} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <span className="font-medium">{category.name}</span>
+            {viewType === "budget" && (
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">งบประมาณรวม <Badge variant="outline">{formatAmount(totalBudget, showMoney)}</Badge></span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {data.map((category) => (
+                    <div key={category.name} className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <span className="font-medium">{category.name}</span>
+                        </div>
+                        <span className="text-sm">
+                          {formatAmount(category.value, showMoney)} / {formatAmount(category.budget, showMoney)}
+                        </span>
                       </div>
-                      <span className="text-sm">
-                        {formatAmount(category.value, showMoney)} / {formatAmount(category.budget, showMoney)}
+                      <div className="relative">
+                        <Progress
+                          value={getbudgetPercentage(category.value, category.budget)}
+                          color={
+                            category.isOver
+                              ? "bg-[#f43f5e]"
+                              : getbudgetPercentage(category.value, category.budget) >= 80
+                                ? "bg-[#f59e0b]"
+                                : "bg-[#10b981]"
+                          }
+                        />
+                        <div
+                          className="absolute top-0 h-full w-[2px] bg-black dark:bg-white transition-all"
+                          style={{ left: `${getbudgetPercentage(category.value, category.budget)}%` }}
+                        ></div>
+                      </div>
+                      {category.isOver && (
+                        <div className="flex items-center text-[#f43f5e] text-sm">
+                          <AlertCircle className="h-4 w-4 mr-1" />
+                          <span>เกินงบประมาณ {formatAmount(category.value - category.budget, showMoney)}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {viewType !== "budget" && (
+              <div className="mt-4 space-y-3">
+                {data.map((category, index) => (
+                  <div
+                    key={category.name}
+                    className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                      />
+                      <span className="font-medium">{category.name}</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <span className="font-medium">
+                        {formatAmount(category.value, showMoney)}
+                      </span>
+                      <span className="text-sm text-muted-foreground min-w-[50px] text-right">
+                        {((category.value / total) * 100).toFixed(2)}%
                       </span>
                     </div>
-                    <div className="relative">
-                      <Progress
-                        value={getbudgetPercentage(category.value, category.budget)}
-                        color={
-                          category.isOver
-                            ? "bg-[#f43f5e]" // แดง
-                            : getbudgetPercentage(category.value, category.budget) >= 80
-                              ? "bg-[#f59e0b]" // ส้ม
-                              : "bg-[#10b981]" // เขียว
-                        }
-                      />
-                      <div
-                        className="absolute top-0 h-full w-[2px] bg-black dark:bg-white transition-all"
-                        style={{ left: `${getbudgetPercentage(category.value, category.budget)}%` }}
-                      ></div>
-                    </div>
-                    {category.isOver && (
-                      <div className="flex items-center text-[#f43f5e] text-sm">
-                        <AlertCircle className="h-4 w-4 mr-1" />
-                        <span>เกินงบประมาณ {formatAmount(category.value - category.budget, showMoney)}</span>
-                      </div>
-                    )}
                   </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
-        {viewType !== "budget" && (
-          <div className="mt-4 space-y-3">
-            {data.map((category, index) => (
-              <div
-                key={category.name}
-                className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center space-x-3">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                  />
-                  <span className="font-medium">{category.name}</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <span className="font-medium">
-                    {formatAmount(category.value, showMoney)}
-                  </span>
-                  <span className="text-sm text-muted-foreground min-w-[50px] text-right">
-                    {((category.value / total) * 100).toFixed(2)}%
-                  </span>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </CardContent>
     </Card>
