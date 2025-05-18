@@ -3,11 +3,13 @@
 import { Eye, EyeOff } from "lucide-react"
 import { useTransactions } from "@/lib/context/transactions-context"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/lib/context/auth-context"
 
 export function MoneyVisibilityToggle() {
   const { showMoney, toggleShowMoney } = useTransactions()
-
+  const { isAuthenticated } = useAuth()
   return (
+    isAuthenticated &&
     <Button
       variant="ghost"
       size="icon"
@@ -21,5 +23,6 @@ export function MoneyVisibilityToggle() {
         <EyeOff className="h-4 w-4" />
       )}
     </Button>
+
   )
 } 

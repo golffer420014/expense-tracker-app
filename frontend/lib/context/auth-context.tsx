@@ -19,6 +19,7 @@ type AuthContextType = {
   logout: () => void;
   isAuthenticated: boolean;
   getToken: () => string | null;
+  checkAuth: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -57,8 +58,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // Check auth on initial load and route changes
-    checkAuth();
+    if (pathname != '/') {
+      checkAuth();
+    }
   }, [pathname]);
 
   const register = async (object: { username: string, name: string, password: string, confirmPassword: string, provider_type: string, provider_user_id: string, avatar_url: string }) => {
@@ -102,8 +104,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
-    showToast.success('ออกจากระบบสำเร็จ');
-    router.push('/login');
+    showToast.info('ออกจากระบบสำเร็จ');
+    router.push('/');
   };
 
   const getToken = () => {
@@ -117,8 +119,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     login,
     logout,
     getToken,
+    checkAuth,
     isAuthenticated: !!user,
-
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -32,7 +32,11 @@ export function CategoriesProvider({ children }: { children: React.ReactNode }) 
     try {
       if (!getToken()) return;
   
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/categories/get-all`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/categories/get-all`,{
+        headers: {
+          Authorization: `Bearer ${getToken()}`
+        }
+      });
       const sorted = sortCategories(response.data);
       setCategories(sorted);
     } catch (error) {

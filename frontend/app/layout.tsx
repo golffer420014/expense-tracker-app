@@ -6,6 +6,7 @@ import { AppProvider } from "@/lib/context/app-provider";
 import { ModeToggle } from "@/components/mode-toggle";
 import Link from "next/link";
 import { MoneyVisibilityToggle } from "@/components/money-visibility-toggle";
+import { ProfileToggle } from "@/components/profile-toggle";
 
 const kanit = Kanit({
   weight: ['300', '400', '500', '600', '700'],
@@ -41,6 +42,7 @@ export default function RootLayout({
               <div className="flex items-center gap-2">
                 <MoneyVisibilityToggle />
                 <ModeToggle />
+                <ProfileToggle />
               </div>
             </div>
           </header>
